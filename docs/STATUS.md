@@ -31,6 +31,14 @@ Final checks: production build; seven frontend unit tests; 29 Python adapter/pip
 
 Next: obtain owner feedback on the running local version, close the DMO coverage/discovery gaps, then implement the separate hosting milestone. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
 
+## Owner feedback queued for later
+
+Requested after the first MVP preview; record only for now, implementation deferred:
+
+- Yield curve: make changes over time easy to compare, including a change-in-yield view in basis points between selected dates.
+- Add comparisons with the other G7 countries (US, Canada, Japan, Germany, France and Italy). Before implementation, check official source availability, reuse terms and comparability of curve definitions, maturities and observation dates; clearly label national currencies and any methodological differences.
+- Add a horizontal-axis label to the yield curve: “Maturity (years)”, including in exported charts.
+
 ## Decisions
 
 Public GitHub repository; intended GitHub Pages and Actions; no recurring paid services. One user, two pages, progressively disclosed detail. Local-first delivery is approved. No duplicate review or source documents: definitions live in the catalogue, plan in PROJECT_PLAN.md, progress here.
