@@ -6,7 +6,7 @@ Updated: 6 September 2026.
 
 - Public repository created and connected to the local project folder.
 - Detailed implementation plan written in [PROJECT_PLAN.md](PROJECT_PLAN.md).
-- Independent design-planning advice and four sceptical plan-review findings incorporated; see [review record](reviews/PLAN_REVIEW.md).
+- Independent design-planning advice and all four sceptical plan-review findings incorporated into the main plan (6 September 2026). No unresolved plan blocker; actual source validation remains M1 work.
 - No application, source adapters, data snapshots, workflows or deployment yet.
 
 ## Milestones
@@ -20,7 +20,7 @@ Updated: 6 September 2026.
 
 ## Next bounded task
 
-Begin M1 after checking the plan review record. Produce `docs/DATA_SOURCES.md`, a small machine-readable catalogue, a reproducible fiscal/forecast sample and representative debt, curve and annual composition samples. Verify actual official downloads and redistribution terms; reconcile the fiscal measures on a common accounting basis. Report specific blockers and feasible fallbacks without stopping unaffected work.
+Begin M1. Produce a small machine-readable source catalogue, a reproducible fiscal/forecast sample and representative debt, curve and annual composition samples. Keep source definitions and reuse notes in the catalogue, without a duplicate source document. Verify actual official downloads and redistribution terms; reconcile the fiscal measures on a common accounting basis. Report specific blockers and feasible fallbacks without stopping unaffected work.
 
 Do not start scenarios, policy tracking, website embedding or elaborate design infrastructure.
 

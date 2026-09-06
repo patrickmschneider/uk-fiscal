@@ -4,6 +4,8 @@ Status: implementation plan; no dashboard or data pipeline has been built.
 Owner: Patrick Schneider. Repository: https://github.com/patrickmschneider/uk-fiscal
 Plan date: 6 September 2026.
 
+Independent sceptical and design-planning reviews completed on 6 September 2026. All recommendations are incorporated here, including explicit required panels, failure signalling during partial updates, code/data compatibility and separate local/hosted test gates. No unresolved plan blocker remains; this does not constitute validation of actual source data or application code.
+
 ## 1. Purpose and agreed constraints
 
 Build a personal briefing tool for an Imperial College macroeconomics professor who wants reliable data to comment on UK fiscal policy. Success is being able to understand a fiscal release, inspect its drivers and obtain a usable chart or dataset within a couple of minutes.
@@ -68,7 +70,7 @@ Optional-field fallbacks do not authorise dropping whole required sections. Miss
 
 ## 3. Data discovery: first implementation milestone
 
-Create `docs/DATA_SOURCES.md` and a machine-readable series/source catalogue before building complex charts. This plan identifies official source families, not validated production endpoints. Source tables, identifiers, licences, automated access and exact mappings still need inspection.
+Create a machine-readable series/source catalogue before building complex charts. Keep verified definitions, source links and reuse notes there rather than duplicating them in a separate source document. This plan identifies official source families, not validated production endpoints. Source tables, identifiers, licences, automated access and exact mappings still need inspection.
 
 | Source | Intended use | Frequency / implementation cautions |
 | --- | --- | --- |
@@ -128,10 +130,8 @@ catalogue/                   series/source definitions and category mappings
 tests/fixtures/              small permitted source examples
 tests/                       statistical/parser tests and browser smoke tests
 docs/PROJECT_PLAN.md          this plan
-docs/DATA_SOURCES.md          verified source contract and reuse notes
 docs/STATUS.md                milestone, next task, blockers and decisions
-docs/OPERATIONS.md            refresh, recovery, deployment and rollback
-docs/reviews/                 short independent review records
+README.md                     setup, usage, refresh, recovery and deployment
 .github/workflows/            checks, refresh and Pages deployment
 ```
 
@@ -199,7 +199,7 @@ Use these as work packages, not calendar promises. Data access is the main uncer
 
 | Milestone | Work and concrete output | Acceptance / dependency |
 | --- | --- | --- |
-| M0: plan review | Independent sceptical review of scope, accounting, free hosting and failure modes; incorporate findings | Short review record; no unresolved issue that invalidates the approach |
+| M0: plan review | Independent sceptical review of scope, accounting, free hosting and failure modes; incorporate findings | Completion noted in STATUS; no unresolved issue that invalidates the approach |
 | M1: source spike | Verified catalogue; small real fiscal/OBR slice; one DMO stock, calendar and results example; one BoE curve; annual composition sample | Local endpoints and reuse terms recorded; borrowing identity and forecast compatibility established; explicit fallbacks/blockers; optional early cloud-access check |
 | M2: fiscal vertical slice | First page running locally from real data; provenance, tables, CSV and narrow-screen layout | Reproduces one official fiscal release; focused independent accounting/code review plus early design review |
 | M3: local MVP | Complete two pages; debt features, annual composition, manual refresh, local vintages and start instructions | Core figures verified; failed-refresh handling checked; integrated code/data and design reviews; local completion checklist met |
@@ -209,6 +209,8 @@ Use these as work packages, not calendar promises. Data access is the main uncer
 M2 is the earliest useful preview. M3 is a valid MVP delivered locally; stop to let the owner use it and report the remaining hosted work separately. M4 fulfils the intended multi-device, automated deployment. M5 can occur after M3 or M4; do not block technical completion indefinitely waiting for the next monthly release—replay a saved release for acceptance and record that live-release feedback is pending. The local app does not need to run on the owner's phone yet: narrow-viewport testing verifies readiness, not multi-device access.
 
 Keep one milestone checklist in `docs/STATUS.md`; use at most roughly 6–10 GitHub issues for substantive work packages or defects when useful. Do not duplicate every checklist item into an issue or establish sprint ceremonies. Maintain a short decisions section for material choices and deviations. Use small branches/PRs by milestone or coherent slice, with problem, resulting behaviour, validation and material limitations in descriptions. Routine implementation decisions belong to the lead; only real scope, privacy, cost or access blockers require user input. The user has already approved the public GitHub/free-hosting direction.
+
+Keep documentation lean: README for practical instructions, this plan for scope and standards, and STATUS for the current handoff. Source metadata belongs in the machine-readable catalogue. Update these in place; do not create per-milestone reports, standalone review files, duplicate runbooks or decision logs. Record reviews in the relevant PR, or briefly in STATUS when no PR exists. Fold accepted recommendations into the plan/code, retain only unresolved actionable items in STATUS, and rely on Git history for past detail. Add another document only when a concrete need cannot be served clearly by these existing locations.
 
 ## 9. Agent use and independent review
 
@@ -222,7 +224,7 @@ Useful parallel assignments after M1: one provider adapter and its fixture tests
 
 **UX/graphic review:** a separately tasked reviewer applies section 7 to rendered desktop/mobile views and actual controls. It may be the same separate agent used for another review if acting with a clear fresh brief, but not the author reviewing their own UI. An independent agent is useful quality control, not a claim of professional accreditation.
 
-Record findings in a short Markdown review: reviewed commit/artifact, severity, evidence/location, impact and recommended action. Lead records fixed / accepted with reason / deferred. Fix incorrect figures, unreproducible core data, broken automation, secrets, inaccessible essential controls and unreadable primary charts before declaring the affected milestone complete. A second pass checks material fixes, not every cosmetic edit. User-facing review summaries should be a few sentences.
+Record findings in the relevant PR, or briefly in STATUS when there is no PR: reviewed commit/artifact, severity, evidence/location, impact and recommended action. Lead records fixed / accepted with reason / deferred, then removes resolved detail from STATUS while retaining a one-line completion note. Fix incorrect figures, unreproducible core data, broken automation, secrets, inaccessible essential controls and unreadable primary charts before declaring the affected milestone complete. A second pass checks material fixes, not every cosmetic edit. User-facing review summaries should be a few sentences; no standalone review document is required.
 
 ## 10. Proportionate verification
 
@@ -254,7 +256,7 @@ Use fixtures for routine CI; keep scheduled live-source health checks separate s
 - [ ] A failed-source exercise preserves good data and produces understandable freshness information.
 - [ ] Public bundle/repository contain no credentials or private material; source reuse is documented.
 - [ ] Independent plan, code/data and design reviews have no unresolved material local-use defects.
-- [ ] A new agent can follow README and OPERATIONS to run locally, refresh and recover the last good data.
+- [ ] A new agent can follow README to run locally, refresh and recover the last good data.
 - [ ] Owner receives exact start commands, the local URL, a short usage note and an honest list of remaining gaps.
 
 ### Hosted release completion checklist (M4)
@@ -291,7 +293,7 @@ Prioritise after real use. These do not need detailed tickets now.
 ## 12. Start instructions for the implementing agent
 
 1. Read README, this plan, current STATUS if present, and applicable repository instructions. Inspect Git status and preserve unrelated user work.
-2. Use the latest plan-review record; if absent, arrange one independent sceptical review before substantial build work. Do not repeat a completed review without a material change.
+2. Check the review completion note in this plan or STATUS. Initial plan review is complete; do not repeat it merely because there is no separate review file. Arrange a new independent review only for a material change that warrants it.
 3. Begin M1. Produce the verified catalogue and a reproducible small fiscal dataset plus representative debt/curve/composition samples. Establish actual source access and accounting identities before promising all fields.
 4. Record any material source constraint and its proposed fallback. Continue unaffected work. Ask only where an answer is necessary for cost, privacy, access or a substantive scope decision.
 5. Build M2 from real data, then obtain the focused independent accounting/code and design reviews. Mock values are allowed only in clearly marked tests/prototypes and must never ship as official data.
