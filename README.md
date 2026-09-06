@@ -17,6 +17,12 @@ Website embedding is outside the initial scope.
 
 ## Status
 
-Repository setup only. The app and update workflows are not yet implemented or deployed.
+Planning complete, subject to the review record below. The app and update workflows are not yet implemented or deployed. The first MVP may run locally; GitHub Pages and scheduled updates are a subsequent milestone.
 
-Next: validate a small set of fiscal series and forecast comparisons, then build the first fiscal page using real data.
+## Implementation handoff
+
+- [Detailed project plan](docs/PROJECT_PLAN.md): local MVP, data and accounting contracts, architecture, milestones, proportionate independent reviews, design standards and future extensions.
+- [Current status and next task](docs/STATUS.md).
+- [Planning review record](docs/reviews/PLAN_REVIEW.md).
+
+Next: validate a small set of fiscal series and forecast comparisons, then build the first fiscal page using real data. Follow the plan's local MVP acceptance criteria before adding hosting and scheduled updates.
