@@ -38,6 +38,8 @@ Requested after the first MVP preview; record only for now, implementation defer
 - Yield curve: make changes over time easy to compare, including a change-in-yield view in basis points between selected dates.
 - Add comparisons with the other G7 countries (US, Canada, Japan, Germany, France and Italy). Before implementation, check official source availability, reuse terms and comparability of curve definitions, maturities and observation dates; clearly label national currencies and any methodological differences.
 - Add a horizontal-axis label to the yield curve: “Maturity (years)”, including in exported charts.
+- Maturity profile: add a histogram or distribution curve showing each maturity bucket as a percentage of the total debt stock, rather than only amounts. State the stock denominator, weighting basis and bucket widths; retain amounts as an optional view.
+- Add a rate-distribution graph combining the maturity profile with the yield curve, weighted by the debt share at each maturity. Clarify the intended measure before implementation: current yields mapped to maturities describe a market-yield distribution / refinancing-cost proxy, whereas rates actually payable on existing debt require contractual coupons and index-linked treatment. Label the measure explicitly and avoid presenting current yields as existing debt-service costs.
 
 ## Decisions
 
