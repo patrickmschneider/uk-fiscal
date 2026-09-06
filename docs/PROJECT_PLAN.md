@@ -1,6 +1,6 @@
 # UK Fiscal Dashboard: implementation and handoff plan
 
-Status: implementation plan; no dashboard or data pipeline has been built.
+Status: implementation reference; the local dashboard and data pipeline are built. See STATUS.md for validation and remaining acceptance gaps.
 Owner: Patrick Schneider. Repository: https://github.com/patrickmschneider/uk-fiscal
 Plan date: 6 September 2026.
 

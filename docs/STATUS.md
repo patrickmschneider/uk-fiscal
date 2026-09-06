@@ -4,41 +4,33 @@ Updated: 6 September 2026.
 
 ## Current state
 
-- Public repository created and connected to the local project folder.
-- Detailed implementation plan written in [PROJECT_PLAN.md](PROJECT_PLAN.md).
-- Independent design-planning advice and all four sceptical plan-review findings incorporated into the main plan (6 September 2026). No unresolved plan blocker; actual source validation remains M1 work.
-- No application, source adapters, data snapshots, workflows or deployment yet.
+A usable two-page local MVP is implemented with real official data, manual refresh, local vintage capture and downloadable charts/data. It has not been deployed. See the README for startup and refresh commands.
 
 ## Milestones
 
-- [x] M0: planning and independent review complete.
-- [ ] M1: source discovery, definitions and representative real-data validation.
-- [ ] M2: first fiscal page working locally with real data.
-- [ ] M3: reviewed two-page local MVP with manual refresh and vintage capture.
-- [ ] M4: hosted release with automated refresh and durable remote archives.
-- [ ] M5: owner feedback and refinement (can begin after M3).
+- [x] M0: planning and independent review.
+- [x] M1: representative official-source validation and accounting reconciliation, with limitations below.
+- [x] M2: fiscal page working locally with real data.
+- [ ] M3: local implementation is usable and reviewed; full recent-auction coverage and reliable calendar discovery remain acceptance gaps.
+- [ ] M4: hosted release, automated refresh and durable remote archives.
+- [ ] M5: owner feedback and refinement; can begin now.
 
-## Next bounded task
+## Validation and review
 
-Begin M1. Produce a small machine-readable source catalogue, a reproducible fiscal/forecast sample and representative debt, curve and annual composition samples. Keep source definitions and reuse notes in the catalogue, without a duplicate source document. Verify actual official downloads and redistribution terms; reconcile the fiscal measures on a common accounting basis. Report specific blockers and feasible fallbacks without stopping unaffected work.
+Independent sceptical plan review was incorporated into PROJECT_PLAN.md. Bounded independent code/data and visual-design reviews were also completed. Fixes include stable historical gilt identities, numeric curve tenors and missing-value handling, calendar-year redemption windows, week-based syndication dates, fiscal-history comparisons, export legends, mobile table cues, contrast and copy-link feedback. Reviews are recorded here rather than retained as separate documents.
 
-Do not start scenarios, policy tracking, website embedding or elaborate design infrastructure.
+Final checks: production build; seven frontend unit tests; 29 Python adapter/pipeline tests; four Chromium/WebKit browser tests, including mobile layouts, keyboard navigation, CSV/SVG downloads and automated accessibility scans. Browser resize checks wait for responsive charts to settle. Real-source checks reconcile monthly spending less receipts to borrowing and annual composition totals within published rounding.
+
+## Known limitations and next task
+
+- DMO auction results have a July–August 2026 gap, with selected subsequent notices. Complete aggregate result discovery and replace curated calendar notice discovery before calling M3 fully accepted. Repeated downloads alone do not make calendar discovery current.
+- Annual functional spending has five consistent years; longer history needs classification-aware extension.
+- Bank of England curves work locally, but their public redistribution is not cleared. Payload and actual workbook are gitignored. Resolve terms or select a permissible equivalent before M4; do not publish the local payload by accident.
+- Vintages currently live only in the local ignored archive. M4 must add durable remote preservation, CI refresh, failure monitoring and hosted-path testing.
+- Production build flags a large chart-library bundle; acceptable for this local version, revisit if hosted performance warrants it.
+
+Next: obtain owner feedback on the running local version, close the DMO coverage/discovery gaps, then implement the separate hosting milestone. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
 
 ## Decisions
 
-- Hosting destination: public GitHub Pages; automation: GitHub Actions; no recurring paid services.
-- Local-only MVP is acceptable and is the first completion gate. Hosting is the next separate milestone.
-- Existing personal website and domain are outside scope.
-- Two local pages, with detailed breakdowns progressively disclosed.
-- Preserve vintages from the first real-data collection, initially locally with a documented remote migration at M4.
-- Independent reviews are bounded milestone checks; one lead remains responsible for integration.
-
-## Unknowns requiring implementation evidence
-
-- Exact fiscal series mappings, source schemas, comparability and history.
-- Current-year OBR monthly profile availability and compatibility.
-- Reliable DMO automated downloads and permitted redistribution.
-- Market-data source reuse terms and cloud-runner access.
-- Actual data size and the simplest durable remote vintage storage choice.
-
-No user input is currently needed to start source discovery.
+Public GitHub repository; intended GitHub Pages and Actions; no recurring paid services. One user, two pages, progressively disclosed detail. Local-first delivery is approved. No duplicate review or source documents: definitions live in the catalogue, plan in PROJECT_PLAN.md, progress here.

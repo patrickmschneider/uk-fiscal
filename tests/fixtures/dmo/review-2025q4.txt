@@ -1,0 +1,31 @@
+Gilt operations review
+Operation
+date
+Gilt name Amount issued (£mn) Cash 
+raised
+(£mn)
+Average 
+accepted 
+yield (%)
+Yield tail
+(bps)
+Bid-to-
+cover ratio 
+(x)Outright PAOF
+Auction(s)
+01-Oct-25 1⅛% Index-linked Treasury Gilt 2035  1,600.0  118.5  1,696.5 1.67 3.09
+02-Oct-25 4¾% Treasury Gilt 2035  4,500.0  -    4,492.5 4.77 0.6 2.78
+08-Oct-25 4% Treasury Gilt 2029  5,000.0  371.4  5,354.1 4.09 0.8 2.92
+15-Oct-25 0⅛% Index-linked Treasury Gilt 2031  1,500.0  -    1,989.1 0.89 3.49
+21-Oct-25 1½% Green Gilt 2053  1,500.0   676.8 5.29 0.8 3.17
+23-Oct-25 4⅛% Treasury Gilt 2031  4,750.0  713.7  5,495.6 4.00 0.7 2.83
+28-Oct-25 1⅛% Index-linked Treasury Gilt 2035  1,500.0  375.0  1,875.3 1.57 2.94
+29-Oct-25 4⅛% Treasury Gilt 2033  3,750.0  937.5  4,668.2 4.19 0.3 3.04
+04-Nov-25 4% Treasury Gilt 2029  5,000.0  50.0  5,075.3 3.85 0.4 3.06
+19-Nov-25 4¾% Treasury Gilt 2035  4,500.0  -    4,549.8 4.61 0.6 2.84
+25-Nov-25 4⅛% Treasury Gilt 2031  4,500.0  1,125.0  5,634.7 4.09 0.6 3.01
+02-Dec-25 0⅛% Index-linked Treasury Gilt 2031  1,000.0  -    1,320.5 0.95 3.88
+03-Dec-25 4% Treasury Gilt 2029  4,750.0  1,187.5  5,964.7 3.85 0.4 3.10
+10-Dec-25 4¾% Treasury Gilt 2035  4,500.0  1,125.0  5,684.5 4.61 0.3 3.05
+16-Dec-25 4⅛% Treasury Gilt 2031  4,250.0  556.0  4,813.1 4.09 0.2 3.23
+Syndication

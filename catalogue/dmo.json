@@ -1,0 +1,228 @@
+{
+  "provider": "UK Debt Management Office",
+  "landingUrl": "https://www.dmo.gov.uk/data/",
+  "licence": "Contains public sector information licensed under the Open Government Licence v3.0. Crown copyright UK Debt Management Office.",
+  "licenceUrl": "https://www.dmo.gov.uk/terms-of-use/",
+  "stock": {
+    "id": "dmo-stock",
+    "name": "DMO Gilts in Issue (D1A)",
+    "url": "https://www.dmo.gov.uk/data/XmlDataReport?reportCode=D1A",
+    "landingUrl": "https://www.dmo.gov.uk/data/pdfdatareport?reportCode=D1A",
+    "units": "GBP million nominal principal; coupon percent per year",
+    "basis": "All gilts in issue, including government holdings; gross stock, not public sector net debt or market value. Unuplifted principal and current inflation-uplifted principal stored separately.",
+    "frequency": "UK working days",
+    "history": "Latest snapshot; new vintages retained by refresh pipeline",
+    "missingValues": "Missing required stock attributes are errors",
+    "revisionBehaviour": "Live snapshot can change; original downloads must be archived"
+  },
+  "notices": [
+    {
+      "id": "dmo-q2",
+      "name": "DMO calendar notice 2026-05-29",
+      "kind": "calendar",
+      "publicationDate": "2026-05-29",
+      "url": "https://dmo.gov.uk/media/xxdl4wzy/pr290526.pdf",
+      "calendarYear": 2026
+    },
+    {
+      "id": "dmo-q3",
+      "name": "DMO calendar notice 2026-08-28",
+      "kind": "calendar",
+      "publicationDate": "2026-08-28",
+      "url": "https://www.dmo.gov.uk/media/qpeksrc0/pr280826.pdf",
+      "calendarYear": 2026
+    },
+    {
+      "id": "dmo-conventional",
+      "name": "DMO auction notice 2026-08-25",
+      "kind": "auction",
+      "publicationDate": "2026-08-25",
+      "url": "https://www.dmo.gov.uk/media/rwgo5vmi/250826conventional.pdf"
+    },
+    {
+      "id": "dmo-index",
+      "name": "DMO auction notice 2026-09-03",
+      "kind": "auction",
+      "publicationDate": "2026-09-03",
+      "url": "https://www.dmo.gov.uk/media/gevj2rat/030926index.pdf"
+    },
+    {
+      "id": "dmo-conventional-paof",
+      "name": "DMO post-auction notice 2026-08-25",
+      "kind": "post-auction",
+      "publicationDate": "2026-08-25",
+      "url": "https://www.dmo.gov.uk/media/wz0prtk1/250826postauctionoption.pdf"
+    },
+    {
+      "id": "dmo-index-paof",
+      "name": "DMO post-auction notice 2026-09-03",
+      "kind": "post-auction",
+      "publicationDate": "2026-09-03",
+      "url": "https://www.dmo.gov.uk/media/wgennarv/pr030926_2.pdf"
+    },
+    {
+      "id": "dmo-announcement",
+      "name": "DMO announcement notice 2026-09-03",
+      "kind": "announcement",
+      "publicationDate": "2026-09-03",
+      "url": "https://www.dmo.gov.uk/media/t3ugflis/pr030926.pdf"
+    },
+    {
+      "id": "dmo-syndication",
+      "name": "DMO syndication notice 2026-08-21",
+      "kind": "syndication",
+      "publicationDate": "2026-08-21",
+      "url": "https://www.dmo.gov.uk/media/2u3laign/pr210826.pdf"
+    },
+    {
+      "id": "dmo-review-2025q3",
+      "name": "DMO quarterly review 2025q3",
+      "kind": "quarterly-review",
+      "publicationDate": "2025-11-07",
+      "url": "https://www.dmo.gov.uk/media/oykbuhke/jul-sep25.pdf",
+      "auctionCount": 18
+    },
+    {
+      "id": "dmo-review-2025q4",
+      "name": "DMO quarterly review 2025q4",
+      "kind": "quarterly-review",
+      "publicationDate": "2026-03-13",
+      "url": "https://dmo.gov.uk/media/wysdetq0/oct-dec-2025.pdf",
+      "auctionCount": 15
+    },
+    {
+      "id": "dmo-review-2026q1",
+      "name": "DMO quarterly review 2026q1",
+      "kind": "quarterly-review",
+      "publicationDate": "2026-05-28",
+      "url": "https://www.dmo.gov.uk/media/dqlnqypb/jan-mar-2026.pdf",
+      "auctionCount": 12
+    },
+    {
+      "id": "dmo-review",
+      "name": "DMO quarterly review review",
+      "kind": "quarterly-review",
+      "publicationDate": "2026-08-18",
+      "url": "https://www.dmo.gov.uk/media/k3obnrea/apr-jun-2026.pdf",
+      "auctionCount": 13
+    }
+  ],
+  "availability": {
+    "stock": "available",
+    "auctions": "partial: quarterly auction tables July 2025\u2013June 2026 plus 25 August and 3 September 2026 results; July\u2013August 2026 coverage incomplete",
+    "calendar": "partial: pinned July\u2013December 2026 quarterly plans plus selected later notices; not a complete live operations feed",
+    "discoveryRequired": true,
+    "calendarPublishedThrough": "2026-12-10",
+    "lastSourceDiscoveryDate": "2026-09-06",
+    "note": "DMO report/issuance endpoints returned a CAPTCHA in the local source spike. Pinned official PDF notices are reproducible but do not discover new, changed or cancelled operations. Re-fetching these URLs does not constitute a fresh calendar check. Stock XML is a live feed."
+  },
+  "definitions": {
+    "stock": "Gross gilts in issue, including government holdings, in GBP million of original nominal principal. Not market value and not public sector net debt.",
+    "maturity": "Contractual maturity of original nominal principal. For index-linked gilts this is not the future cash redemption payment, which depends on RPI. No future inflation uplift is forecast.",
+    "uplifted": "Nominal amount including DMO current inflation uplift, separately available; not a future redemption forecast.",
+    "coupon": "Annual coupon percentage of nominal principal; not current market yield. Linker cash coupons also reflect indexation.",
+    "auctionAmounts": "GBP million nominal, excluding post-auction option unless explicitly shown separately.",
+    "auctionYield": "Conventional: yield at average accepted price. Index-linked: real striking yield. Do not compare these directly.",
+    "cover": "Total bids divided by amount offered; DMO figure rounded to two decimals. Not bidder identities or investor allocations.",
+    "tail": "Conventional yield at lowest accepted price less yield at average accepted price, in basis points using unrounded yields; not applicable to linker single-price auctions.",
+    "calendar": "Quarterly dates are plans and later announcements can supersede them. Syndication date marked week commencing is not an exact sale date. Sizes are null until present in an announcement. The September 24 switch-auction pilot transfers no gilts and is excluded.",
+    "auctionPrecision": "Quarterly review rows have issuance/PAOF rounded to \u00a30.1m and yields rounded to 0.01 percentage points. Offered amount and total bids are unavailable in these tables; dash/blank PAOF retained as null. Individual notices retain published precision."
+  },
+  "instrumentIdentities": [
+    {
+      "isin": "GB00BSQNRC93",
+      "name": "4 3/8% Treasury Gilt 2028",
+      "maturityDate": "2028-03-07"
+    },
+    {
+      "isin": "GB00BVP99566",
+      "name": "4% Treasury Gilt 2029",
+      "maturityDate": "2029-05-22"
+    },
+    {
+      "isin": "GB00BSQNRD01",
+      "name": "4 3/8% Treasury Gilt 2030",
+      "maturityDate": "2030-03-07"
+    },
+    {
+      "isin": "GB00BVP99673",
+      "name": "4 1/8% Treasury Gilt 2031",
+      "maturityDate": "2031-03-07"
+    },
+    {
+      "isin": "GB00BNNGP551",
+      "name": "0 1/8% Index-linked Treasury Gilt 2031",
+      "maturityDate": "2031-08-10"
+    },
+    {
+      "isin": "GB00BPSNBF73",
+      "name": "4% Treasury Gilt 2031",
+      "maturityDate": "2031-10-22"
+    },
+    {
+      "isin": "GB00BVP99780",
+      "name": "4 1/8% Treasury Gilt 2033",
+      "maturityDate": "2033-03-07"
+    },
+    {
+      "isin": "GB00BT7J0027",
+      "name": "4\u00bd% Treasury Gilt 2035",
+      "maturityDate": "2035-03-07"
+    },
+    {
+      "isin": "GB00BT7HZZ68",
+      "name": "1 1/8% Index-linked Treasury Gilt 2035",
+      "maturityDate": "2035-09-22"
+    },
+    {
+      "isin": "GB00BTXS1K06",
+      "name": "4\u00be% Treasury Gilt 2035",
+      "maturityDate": "2035-10-22"
+    },
+    {
+      "isin": "GB00BWBR1N39",
+      "name": "4 7/8% Treasury Gilt 2036",
+      "maturityDate": "2036-07-31"
+    },
+    {
+      "isin": "GB00BVP99905",
+      "name": "4 5/8% Green Gilt 2037",
+      "maturityDate": "2037-03-07"
+    },
+    {
+      "isin": "GB00BQC82D08",
+      "name": "4 3/8% Treasury Gilt 2040",
+      "maturityDate": "2040-01-31"
+    },
+    {
+      "isin": "GB00BPJJKP77",
+      "name": "4\u00be% Treasury Gilt 2043",
+      "maturityDate": "2043-10-22"
+    },
+    {
+      "isin": "GB00BMF9LH90",
+      "name": "0 5/8% Index-linked Treasury Gilt 2045",
+      "maturityDate": "2045-03-22"
+    },
+    {
+      "isin": "GB00BT7J0134",
+      "name": "1 7/8% Index-linked Treasury Gilt 2049",
+      "maturityDate": "2049-09-22"
+    },
+    {
+      "isin": "GB00BM8Z2V59",
+      "name": "1\u00bd% Green Gilt 2053",
+      "maturityDate": "2053-07-31"
+    },
+    {
+      "isin": "GB00BT7J0241",
+      "name": "5 3/8% Treasury Gilt 2056",
+      "maturityDate": "2056-01-31"
+    }
+  ],
+  "instrumentIdentityProvenance": {
+    "sourceUrl": "https://www.dmo.gov.uk/data/XmlDataReport?reportCode=D1A",
+    "observationDate": "2026-09-04",
+    "basis": "Archived D1A ISIN/name/maturity mapping for historical auction instruments. Retain identities after maturity; never regenerate this map solely from live stock. Full source names (with normalised coupon notation) must be unique; ambiguous/new identities require source-verified catalogue additions."
+  }
+}

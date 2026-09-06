@@ -1,0 +1,23 @@
+{
+  "provider": "Bank of England",
+  "measure": "Nominal government liability zero-coupon spot curve",
+  "entryUrl": "https://www.bankofengland.co.uk/statistics/yield-curves",
+  "downloadUrls": [
+    "https://www.bankofengland.co.uk/-/media/boe/files/statistics/yield-curves/glcnominalddata.zip",
+    "https://www.bankofengland.co.uk/-/media/boe/files/statistics/yield-curves/latest-yield-curve-data.zip"
+  ],
+  "units": "Percent per annum, continuously compounded; maturity in years",
+  "frequency": "Business daily",
+  "releaseLag": "Bank aims to publish by noon next business day; archive revised by close of second working day of month",
+  "transformation": "Select GLC Nominal XLSX and 4. nominal spot curve (older archive) or 4. spot curve (current). Require years-labelled numeric header. Preserve missing values as null, discard entirely empty non-trading dates. Merge archive and current month with current taking precedence; retain 370 calendar days.",
+  "status": "validated locally; public redistribution gate unresolved",
+  "accessEvidence": {
+    "checkedAt": "2026-09-06T21:01:26.697723+00:00",
+    "result": "Official archive and latest ZIP successfully downloaded with the project identified User-Agent; initial anonymous requests had returned 403."
+  },
+  "validation": "Official downloaded archive and current ZIP inspected and parsed. 257 populated business observations from 2025-08-29 through 2026-09-03, 80 half-year tenor slots through 40 years. Latest 10-year spot 5.1575084015148365 percent verified against workbook cell. Six tests pass including local official fixture regression and null-gap/empty-day checks.",
+  "licenceUrl": "https://www.bankofengland.co.uk/legal",
+  "licenceNote": "Checked 6 September 2026: Bank legal Copyright section allows personal/internal noncommercial download/display/print; further reuse requires authorisation. Its OGL clause expressly covers the Database, not clearly this separately published yield-curve download. Yield page allows electronic storage subject to legal terms. Local use is supported; public redistribution is not cleared. Keep raw workbooks, real fixtures and curve payload out of public Git history/hosting until cleared. No permission request has been sent.",
+  "failure": "Keep last verified payload and mark refresh failure; never replace spot curve with auction YTMs, OIS, forward curve or fabricated data.",
+  "attribution": "Bank of England. Workbook source line: Bloomberg Finance L.P., Tradeweb and Bank calculations."
+}

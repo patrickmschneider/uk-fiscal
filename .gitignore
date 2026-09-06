@@ -10,3 +10,9 @@ __pycache__/
 .pytest_cache/
 .codex/
 data/archive/
+*.tsbuildinfo
+test-results/
+playwright-report/
+# BoE download terms permit personal/internal use; public redistribution needs review.
+public/data/curve.json
+data/fixtures/boe/

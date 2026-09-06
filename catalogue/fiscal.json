@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "ons-pusf",
+      "landingUrl": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectorfinances",
+      "downloadUrl": "https://www.ons.gov.uk/file?uri=/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectorfinances/current/pusf.csv",
+      "format": "CSV",
+      "publicationDate": "2026-08-21",
+      "frequency": "monthly",
+      "history": "2000-04 onward in app",
+      "unit": "\u00a3 million except debt \u00a3 billion and published debt/GDP %",
+      "basis": "Current prices, accruals, not seasonally adjusted",
+      "scope": "UK public sector excluding public sector banks",
+      "licence": {
+        "name": "Open Government Licence v3.0",
+        "url": "https://www.ons.gov.uk/methodology/geography/licences"
+      },
+      "revisions": "Whole current-vintage history is downloaded; original files and derived snapshots retained when content changes",
+      "missingValues": [
+        "",
+        "..",
+        "...",
+        "NA"
+      ],
+      "series": {
+        "borrowing": {
+          "code": "DZLS",
+          "label": "Net borrowing",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "Public sector net borrowing, excluding public sector banks (\u00a3 million)"
+        },
+        "receipts": {
+          "code": "JW2O",
+          "label": "Current receipts",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: exc PS Banks: Total current receipts: \u00a3m CPNSA"
+        },
+        "spending": {
+          "code": "KX5Q",
+          "label": "Total managed expenditure",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: exc PS Banks: Total managed expenditure: \u00a3m CPNSA"
+        },
+        "debtPct": {
+          "code": "HF6X",
+          "label": "Public sector net debt",
+          "unit": "% of GDP",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: Net Debt (excluding public sector banks) as a % of GDP: NSA"
+        },
+        "debtBillion": {
+          "code": "HF6W",
+          "label": "Public sector net debt",
+          "unit": "\u00a3 billion",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: Net Debt (excluding public sector banks): \u00a3bn: CPNSA"
+        },
+        "incomeTax": {
+          "code": "LIBR",
+          "label": "Income tax & capital gains tax",
+          "unit": "\u00a3 million",
+          "scope": "Central government",
+          "sourceTitle": "CG: Current receipts:Taxes on income: Income tax and capital gains tax: \u00a3m CPNSA"
+        },
+        "nic": {
+          "code": "AIIH",
+          "label": "Compulsory social contributions",
+          "unit": "\u00a3 million",
+          "scope": "Central government",
+          "sourceTitle": "CG: Current receipts: Compulsory social contributions: Receivable: \u00a3m CPNSA"
+        },
+        "vat": {
+          "code": "NZGF",
+          "label": "VAT",
+          "unit": "\u00a3 million",
+          "scope": "Central government",
+          "sourceTitle": "CG: Current receipts: Taxes on production: VAT, receivable: \u00a3m CPNSA"
+        },
+        "corporationTax": {
+          "code": "CPRN",
+          "label": "Corporation tax (gross of tax credits)",
+          "unit": "\u00a3 million",
+          "scope": "Central government",
+          "sourceTitle": "CG: Receipts: Corporation tax: Accrued: Gross of tax credits: \u00a3m:NSA"
+        },
+        "goodsServices": {
+          "code": "FV4W",
+          "label": "Goods & services",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "Public Sector ex PS Banks: Current expenditure on goods and services (D.1 + P.2): \u00a3m CPNSA"
+        },
+        "benefits": {
+          "code": "CWNZ",
+          "label": "Net social benefits",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS ex PS Banks: Current expenditure: Net Social Benefits Payable: (\u00a3m) CP NSA"
+        },
+        "interest": {
+          "code": "JW2P",
+          "label": "Interest & dividends to private sector / rest of world",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS:exc PS Banks: Current exp: Interest & divs paid to private sector and RoW: \u00a3m"
+        },
+        "netInvestment": {
+          "code": "DZLW",
+          "label": "Net investment",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "Public sector net investment, excluding public sector banks (\u00a3 million)"
+        },
+        "depreciation": {
+          "code": "JW2S",
+          "label": "Consumption of fixed capital",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: exc PS Banks: Depreciation: Consumption of fixed capital: \u00a3m CPNSA"
+        },
+        "currentSpending": {
+          "code": "JW2Q",
+          "label": "Current expenditure",
+          "unit": "\u00a3 million",
+          "scope": "UK public sector excluding public sector banks",
+          "sourceTitle": "PS: exc PS Banks: Total current expenditure: \u00a3m CPNSA"
+        }
+      },
+      "validation": [
+        "Positive borrowing is a deficit; negative borrowing is a surplus.",
+        "Total managed expenditure \u2212 current receipts = net borrowing (all excluding public sector banks).",
+        "Total managed expenditure = current expenditure + consumption of fixed capital + net investment.",
+        "Selected tax details cover central government and do not form an exhaustive public-sector receipts decomposition.",
+        "GDP ratios are published ONS ratios using the ONS denominator convention, not ratios calculated by this dashboard.",
+        "All historical observations use this release vintage and are subject to revision."
+      ]
+    },
+    {
+      "id": "pesa-2026",
+      "landingUrl": "https://www.gov.uk/government/statistics/public-expenditure-statistical-analyses-2026",
+      "downloadUrl": "https://assets.publishing.service.gov.uk/media/6a5772f59e63154454413701/PESA_2026_CP_Chapter_5_tables.xlsx",
+      "format": "xlsx",
+      "table": "5_2",
+      "frequency": "annual",
+      "publicationDate": "2026-07-16",
+      "history": "2021-22 to 2025-26; same publication vintage",
+      "unit": "\u00a3 million, current prices",
+      "scope": "Public sector expenditure on services",
+      "licence": {
+        "name": "Open Government Licence v3.0",
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "discovery": "Pinned PESA 2026 edition. Review newer PESA editions annually; do not silently change classification."
+    }
+  ]
+}

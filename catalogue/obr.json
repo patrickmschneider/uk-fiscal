@@ -1,0 +1,20 @@
+{
+  "provider": "ONS / OBR",
+  "measure": "PSNB excluding public sector banks",
+  "source": "ONS monthly PSF bulletin cumulative borrowing chart CSV",
+  "entryUrl": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/latest",
+  "sampleUrl": "https://www.ons.gov.uk/generator?format=csv&uri=%2Feconomy%2Fgovernmentpublicsectorandtaxes%2Fpublicsectorfinance%2Fbulletins%2Fpublicsectorfinances%2Fjuly2026%2F2bf21d77",
+  "units": "\u00a3 billion",
+  "frequency": "monthly cumulative financial-year forecast",
+  "vintage": "Parsed from download notes; March 2026 in initial fixture",
+  "releaseDate": "ONS republication date, parsed from bulletin; original forecast and profile publication dates are distinct",
+  "transformations": [
+    "Select explicitly labelled OBR forecast column",
+    "Require 12 labelled months April\u2013March",
+    "Retain cumulative figures as published, no interpolation"
+  ],
+  "compatibility": "Compare only with ONS public-sector net borrowing excluding public-sector banks for the same financial year. \u00a30.1bn source rounding applies.",
+  "failure": "Reject changed units, missing vintage, ambiguous chart, malformed year, incomplete profile or non-finite values. Keep last verified payload; report refresh failure.",
+  "validation": "Real ONS July 2026 bulletin fixture: April 20.9, July 54.4 and March 115.4 billion; fiscal-year rollover and seasonal surplus preserved.",
+  "licence": "ONS Open Government Licence applies to republication; retain ONS/OBR attribution."
+}
