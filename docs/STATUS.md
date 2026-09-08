@@ -25,7 +25,7 @@ Final checks: production build; 14 frontend unit tests; 43 Python adapter/pipeli
 
 - DMO auction results have a July–August 2026 gap, with selected subsequent notices. Complete aggregate result discovery and replace curated calendar notice discovery before calling M3 fully accepted. Repeated downloads alone do not make calendar discovery current.
 - Annual functional history now spans 2003-04–2025-26 on the PESA 2026 vintage. Published classification breaks are labelled; the exact five-year functional snapshot remains available separately.
-- Bank of England curves work locally, but their public redistribution is not cleared. Payload and actual workbook are gitignored. Resolve terms or select a permissible equivalent before M4; do not publish the local payload by accident.
+- Owner authorised public non-commercial use of the fitted BoE curve outputs on 9 September, accepting the reuse uncertainty with attribution. The former project publication hold is removed; this is not specific permission from the Bank. Curve outputs are tracked, original workbooks remain local. Attribution is shown in-app and in CSV/SVG exports; details in catalogue/boe.json.
 - Vintages currently live only in the local ignored archive. M4 must add durable remote preservation, CI refresh, failure monitoring and hosted-path testing.
 - Production build flags a large chart-library bundle; acceptable for this local version, revisit if hosted performance warrants it.
 

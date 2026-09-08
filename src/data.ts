@@ -1,4 +1,4 @@
-export type Source = {id:string; name?:string; title?:string; publisher?:string; url:string; downloadUrl?:string; publicationDate?:string|null; observationDate?:string; retrievedAt?:string; licence?:string};
+export type Source = {id:string;attribution?:string; name?:string; title?:string; publisher?:string; url:string; downloadUrl?:string; publicationDate?:string|null; observationDate?:string; retrievedAt?:string; licence?:string};
 export type Observation = {date:string; [key:string]:number|string|null};
 export type Series = {code:string;label:string;unit:string;scope:string;sourceTitle:string};
 export type Gdp = {basis:string;sources:Source[];observations:{date:string;rollingAnnualMillion:number|null}[]};

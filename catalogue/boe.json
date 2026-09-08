@@ -11,19 +11,24 @@
   "frequency": "Business daily",
   "releaseLag": "Bank aims to publish by noon next business day; archive revised by close of second working day of month",
   "transformation": "Select GLC Nominal and GLC Real XLSX, whole spot-curve sheet 4. Preserve missing values as null and discard entirely empty non-trading dates. Merge each archive with current month, current taking precedence; retain 370 calendar days. RPI breakeven is nominal minus real continuously compounded spot yield at exactly matching dates and maturities, with no interpolation or nearest-date substitution. Missing tenors stay null.",
-  "status": "validated locally; public redistribution gate unresolved",
+  "status": "validated; owner authorised attributed public non-commercial dashboard use",
   "accessEvidence": {
     "checkedAt": "2026-09-08T17:32:53.970453+00:00",
     "result": "Official nominal archive, real archive and latest ZIP successfully downloaded with project identified User-Agent; all three curve series validated and promoted for local use."
   },
   "validation": "Eleven parser and matching tests pass, including locally downloaded official workbook regression: derived nominal-minus-real matches published inflation spot cells to ten decimal places. Missing date/tenor observations cannot be manufactured.",
   "licenceUrl": "https://www.bankofengland.co.uk/legal",
-  "licenceNote": "Checked 6 September 2026: Bank legal Copyright section allows personal/internal noncommercial download/display/print; further reuse requires authorisation. Its OGL clause expressly covers the Database, not clearly this separately published yield-curve download. Yield page allows electronic storage subject to legal terms. Local use is supported; public redistribution is not cleared. Keep raw workbooks, real fixtures and curve payload out of public Git history/hosting until cleared. No permission request has been sent.",
+  "licenceNote": "Reviewed 9 September 2026: Database OGL coverage is explicit, while fitted-curve download reuse is not explicitly resolved by that clause. General terms allow personal/internal non-commercial use and say academic reuse is typically authorised. No specific BoE permission has been obtained; do not label this dataset OGL or claim permission from the Bank.",
   "failure": "Keep last verified payload and mark refresh failure; never replace spot curve with auction YTMs, OIS, forward curve or fabricated data.",
   "attribution": "Bank of England. Workbook source line: Bloomberg Finance L.P., Tradeweb and Bank calculations.",
   "methodologyUrls": [
     "https://www.bankofengland.co.uk/statistics/yield-curves/terminology-and-concepts",
     "https://www.bankofengland.co.uk/statistics/details/further-details-about-yields-data"
   ],
-  "interpretation": "Market inflation compensation includes inflation risk premia and liquidity effects; it is not a pure expectation or CPI forecast. RPI methods/data sources align with CPIH from February 2030; Bank notes that this may affect fitting around that horizon and has not changed its methodology."
+  "interpretation": "Market inflation compensation includes inflation risk premia and liquidity effects; it is not a pure expectation or CPI forecast. RPI methods/data sources align with CPIH from February 2030; Bank notes that this may affect fitting around that horizon and has not changed its methodology.",
+  "reuseDecision": {
+    "date": "2026-09-09",
+    "authorisation": "Owner explicitly accepts the licensing uncertainty and authorises public non-commercial use with source recognition. This removes the project publication hold; it is an owner decision, not a legal determination or Bank permission.",
+    "scope": "Publish attributed fitted-curve outputs and dashboard calculations; retain original vendor-input/download workbook fixtures locally."
+  }
 }

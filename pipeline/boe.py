@@ -113,7 +113,7 @@ def fetch_curve(fetch):
         'basis': 'Bank of England fitted gilt zero-coupon spot curves, continuously compounded; tenor in years. RPI breakeven = nominal minus real on the same observation date and maturity.',
         'asOf': latest.isoformat(), 'observationDate': latest.isoformat(), 'publicationDate': None,
         'realAsOf': max(real), 'breakevenAsOf': max(breakevens),
-        'sources': [{'id': 'boe-curve', 'publisher': 'Bank of England', 'title': 'Nominal and real gilt spot yield curves; derived RPI breakevens', 'url': PAGE_URL, 'downloadUrls': [ARCHIVE_URL, REAL_ARCHIVE_URL, LATEST_URL]}],
+        'sources': [{'id': 'boe-curve', 'publisher': 'Bank of England', 'name': 'Bank of England · Gilt yield curves', 'attribution': 'Underlying inputs: Bloomberg Finance L.P. and Tradeweb; fitted curves: Bank of England. Breakevens and date comparisons calculated by UK Fiscal. Independent presentation; no Bank endorsement.', 'title': 'Nominal and real gilt spot yield curves; derived RPI breakevens', 'url': PAGE_URL, 'downloadUrls': [ARCHIVE_URL, REAL_ARCHIVE_URL, LATEST_URL]}],
         'curves': rows(nominal), 'realCurves': rows(real), 'breakevenCurves': rows(breakevens),
         'notes': [
             'Missing tenor values remain null without interpolation. Entirely empty non-trading dates are excluded. Observation date is not the publication or retrieval date.',

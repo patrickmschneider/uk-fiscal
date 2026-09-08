@@ -26,7 +26,7 @@ python -m pipeline.refresh
 
 Use `--group fiscal`, `--group composition`, `--group debt`, `--group forecast` or `--group curve` for an individual source group. `--offline` replays locally archived downloads; `--validate` checks saved data. A failed group keeps its last good dataset, records the failure and returns a nonzero exit code. Downloads and release vintages are retained in ignored `data/archive/`; back up that directory if you need those vintages. Remote durable archives are planned with hosting.
 
-Bank of England curve downloads are used locally under personal/internal-use terms. Their derived payload and original workbook are deliberately excluded from GitHub until public redistribution is cleared. On a fresh checkout, run `python -m pipeline.refresh --group curve` to populate the curve panel. Other panels work without it.
+The repository includes fitted Bank of England curve outputs for this non-commercial academic dashboard, under the owner’s explicit decision to proceed with attribution despite unresolved reuse wording. This is not a claim of Open Government Licence coverage or specific Bank permission. The app and exports credit the Bank and its stated Bloomberg/Tradeweb inputs, distinguish dashboard calculations and disclaim endorsement. Original downloaded workbooks remain local. Run `python -m pipeline.refresh --group curve` to update the saved curves.
 
 ## Current coverage
 

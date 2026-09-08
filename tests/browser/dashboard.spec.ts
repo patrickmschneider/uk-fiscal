@@ -61,11 +61,11 @@ test('Pricing compares matched curves and exports maturity-labelled changes',asy
  await page.getByText('RPI breakeven inflation: change in basis points',{exact:true}).click();
  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download RPI breakeven inflation change CSV',exact:true}).click();
  const download=await downloadPromise;const file=testInfo.outputPath('breakeven-change.csv');await download.saveAs(file);
- const text=await fs.readFile(file,'utf8');expect(text).toContain('Maturity (years)');expect(text).toContain('Change (bp)');
+ const text=await fs.readFile(file,'utf8');expect(text).toContain('Maturity (years)');expect(text).toContain('Change (bp)');expect(text).toContain('Bank of England');expect(text).toContain('Bloomberg');expect(text).toContain('Tradeweb');
  const old=previous.points.find((p:{tenor:number})=>p.tenor===10);expect(text).toContain(String((point.rate-old.rate)*100));
  await page.setViewportSize({width:375,height:900});
  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- const svgPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download Nominal gilt yield curve SVG',exact:true}).click();const svg=await svgPromise;const svgPath=testInfo.outputPath('pricing.svg');await svg.saveAs(svgPath);expect(await fs.readFile(svgPath,'utf8')).toContain('Maturity (years)');
+ const svgPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download Nominal gilt yield curve SVG',exact:true}).click();const svg=await svgPromise;const svgPath=testInfo.outputPath('pricing.svg');await svg.saveAs(svgPath);const exportedSvg=await fs.readFile(svgPath,'utf8');expect(exportedSvg).toContain('Maturity (years)');expect(exportedSvg).toContain('Bank of England');expect(exportedSvg).toContain('Tradeweb');
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
  await page.screenshot({path:testInfo.outputPath('pricing-mobile.png'),fullPage:true});
  await page.getByRole('button',{name:'Debt & financing',exact:true}).click();await expect(page.getByRole('heading',{name:'Nominal gilt yield curve',exact:true})).toHaveCount(0);

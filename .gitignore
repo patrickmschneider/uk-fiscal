@@ -13,6 +13,5 @@ data/archive/
 *.tsbuildinfo
 test-results/
 playwright-report/
-# BoE download terms permit personal/internal use; public redistribution needs review.
-public/data/curve.json
+# Keep original downloaded BoE workbooks local; attributed curve outputs are tracked.
 data/fixtures/boe/
