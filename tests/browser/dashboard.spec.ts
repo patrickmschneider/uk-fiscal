@@ -140,3 +140,15 @@ test('annual budget histories reconcile and compare functional and revenue contr
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
 });
+
+
+test('RPI chart exposes its comparison calendar and updates the plotted comparison',async({page,request})=>{
+ const data=await (await request.get('/data/curve.json')).json();const old=data.breakevenCurves[30];
+ await page.goto('/?page=pricing');
+ const panel=page.locator('[aria-labelledby="breakeven-title"]');
+ await expect(panel.locator('summary[aria-label^="RPI breakeven: compare with: "]')).toBeVisible();
+ await chooseDate(page,'RPI breakeven: compare with',old.date);
+ await page.getByRole('button',{name:'Show data table for RPI breakeven inflation',exact:true}).click();
+ await expect(panel.getByRole('table')).toContainText(old.points.find((p:{tenor:number})=>p.tenor===10).rate.toFixed(2));
+ await expect(page).toHaveURL(new RegExp(`pricingCompare=${old.date}`));
+});

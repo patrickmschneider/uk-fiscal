@@ -60,3 +60,5 @@ Next: obtain owner feedback on the running local version, close the DMO coverage
 ## Decisions
 
 Public GitHub repository; intended GitHub Pages and Actions; no recurring paid services. One user, three tabs, progressively disclosed detail. Local-first delivery is approved. No duplicate review or source documents: definitions live in the catalogue, plan in PROJECT_PLAN.md, progress here.
+
+RPI control refinement: comparison and observation calendars now also appear directly on the RPI breakeven level chart. They share the selected dates with the pricing/change panels; a browser regression checks that the selected historical curve appears in the data table.
