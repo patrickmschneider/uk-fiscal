@@ -128,6 +128,27 @@
           "unit": "£ million",
           "scope": "UK public sector excluding public sector banks",
           "sourceTitle": "PS: exc PS Banks: Total current expenditure: £m CPNSA"
+        },
+        "totalTaxes": {
+          "code": "AHHY",
+          "label": "Public sector taxes and NICs",
+          "unit": "£ million",
+          "scope": "UK public sector excluding public sector banks",
+          "optionalInOlderSnapshots": true
+        },
+        "councilTax": {
+          "code": "NMHM",
+          "label": "Council tax",
+          "unit": "£ million",
+          "scope": "Local government",
+          "optionalInOlderSnapshots": true
+        },
+        "interestReceipts": {
+          "code": "JW2L",
+          "label": "Interest & dividends received from private sector / rest of world",
+          "unit": "£ million",
+          "scope": "UK public sector excluding public sector banks",
+          "optionalInOlderSnapshots": true
         }
       },
       "validation": [
@@ -147,14 +168,26 @@
       "table": "5_2",
       "frequency": "annual",
       "publicationDate": "2026-07-16",
-      "history": "2021-22 to 2025-26; same publication vintage",
+      "history": "2003-04 to 2025-26 in tables 4.2/4.4; detailed table 5.2 covers 2021-22 to 2025-26. Single publication vintage with explicit classification breaks.",
       "unit": "£ million, current prices",
       "scope": "Public sector expenditure on services",
       "licence": {
         "name": "Open Government Licence v3.0",
         "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
       },
-      "discovery": "Pinned PESA 2026 edition. Review newer PESA editions annually; do not silently change classification."
+      "discovery": "Pinned PESA 2026 edition. Review newer PESA editions annually; do not silently change classification.",
+      "historyDownloadUrl": "https://assets.publishing.service.gov.uk/media/6a5772e09e63154454413700/PESA_2026_CP_Chapter_4_tables.xlsx",
+      "historyTables": [
+        "4_2",
+        "4_4"
+      ],
+      "historyUnits": "Table 4.2 £ billion converted to £ million; table 4.4 published % of GDP (ONS GDP vintage 30 June 2026).",
+      "historyValidation": [
+        "Eleven function totals reconcile to TES within source rounding; keep explicit rounding adjustment.",
+        "TES plus published accounting adjustments bridges to TME within source rounding.",
+        "Debt interest is an of-which part of general public services, not an additional function.",
+        "Retain education/student loans (2011-12), transport/TfL (2011-12), Network Rail (2015-16) and EU transactions (2010-11) classification notes."
+      ]
     },
     {
       "id": "ons-gdp-bktl",

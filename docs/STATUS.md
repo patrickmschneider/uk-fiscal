@@ -19,12 +19,12 @@ A usable three-tab local MVP is implemented with real official data, manual refr
 
 Independent sceptical plan review was incorporated into PROJECT_PLAN.md. Bounded independent code/data and visual-design reviews were also completed. Fixes include stable historical gilt identities, numeric curve tenors and missing-value handling, calendar-year redemption windows, week-based syndication dates, fiscal-history comparisons, export legends, mobile table cues, contrast and copy-link feedback. Reviews are recorded here rather than retained as separate documents.
 
-Final checks: production build; 10 frontend unit tests; 39 Python adapter/pipeline tests; 12 Chromium/WebKit browser tests, including mobile layouts, keyboard navigation, CSV/SVG downloads and automated accessibility scans. Browser resize checks wait for responsive charts to settle. Real-source checks reconcile monthly spending less receipts to borrowing and annual composition totals within published rounding.
+Final checks: production build; 14 frontend unit tests; 43 Python adapter/pipeline tests; 14 Chromium/WebKit browser tests, including mobile layouts, keyboard navigation, CSV/SVG downloads and automated accessibility scans. Browser resize checks wait for responsive charts to settle. Real-source checks reconcile monthly spending less receipts to borrowing and annual composition totals within published rounding.
 
 ## Known limitations and next task
 
 - DMO auction results have a July–August 2026 gap, with selected subsequent notices. Complete aggregate result discovery and replace curated calendar notice discovery before calling M3 fully accepted. Repeated downloads alone do not make calendar discovery current.
-- Annual functional spending has five consistent years; longer history needs classification-aware extension.
+- Annual functional history now spans 2003-04–2025-26 on the PESA 2026 vintage. Published classification breaks are labelled; the exact five-year functional snapshot remains available separately.
 - Bank of England curves work locally, but their public redistribution is not cleared. Payload and actual workbook are gitignored. Resolve terms or select a permissible equivalent before M4; do not publish the local payload by accident.
 - Vintages currently live only in the local ignored archive. M4 must add durable remote preservation, CI refresh, failure monitoring and hosted-path testing.
 - Production build flags a large chart-library bundle; acceptable for this local version, revisit if hosted performance warrants it.
@@ -42,6 +42,13 @@ Next: obtain owner feedback on the running local version, close the DMO coverage
 - The saved payload contains all three curves. A stale nominal-only in-memory snapshot was identified as a reproducible cause of missing real/breakeven panels: the original app loaded JSON only once. Data reads now bypass the browser cache and reload on focus/visibility return; Pricing also offers Reload saved data and explains incomplete snapshots. This mechanism is verified in headless regression tests; the user's original screen state was not inspected.
 - An independent static review identified optional-source reload failures discarding last-good curves. Reload now retains prior curve/forecast datasets and shows the failed-read warning; a 503 regression verifies this.
 - Replaced date lists with year/month calendar controls and previous/next-month arrows. Only published observation days are selectable. Shared controls are also available inside every change panel, with selected dates retained in the URL. Keyboard Escape, mobile sizing and accessibility are covered in Chromium/WebKit tests. No screen or microphone access is needed for these checks.
+
+## Budget history and interest bridge, 9 September
+
+- Added Compare budgets over time on Fiscal position: full-year economic spending, functional spending and revenue composition, in % GDP, % of total or £bn. Two selected years produce a ranked percentage-point contribution table and CSV. Functional history covers 23 years from PESA 2026 chapter 4 (official rounded amounts and GDP shares), keeping TES/TME and accounting adjustments distinct. Debt interest is identified as an of-which within general public services, never counted twice.
+- Added taxes/NICs versus total receipts (ONS AHHY/JW2O), council tax and interest/dividend receipts (JW2L). Economic/revenue history uses matched financial-year nominal GDP. Explicit residuals preserve totals; rounding is present in every functional year, including zeros. Independent review suggestions on rounding and denominator notes were incorporated.
+- Current-vintage annual TME: 39.1% GDP in 2019-20, 44.3% in 2025-26. PESA debt interest +1.8pp, health +1.1pp, social protection +1.1pp; social protection includes pensions and services. Dashboard broad net interest/dividends is 1.45%→2.87%; subtracting it yields spending of 37.6%→41.4%. This analytical bridge includes dividends and is not an official primary-spending measure. A plateau is not evidence of a steady state.
+- Automated tests check annual boundaries, residual reconciliation, functional changes, the interest bridge and mobile accessibility without accessing the user's screen or microphone. Fixed tooltip text contrast revealed by the new open-history test.
 
 ## Owner feedback queued for later
 

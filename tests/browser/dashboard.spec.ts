@@ -119,3 +119,24 @@ test('failed curve reload preserves all last-good pricing curves',async({page})=
  await expect(page.getByText('Some saved data could not be loaded.',{exact:false})).toBeVisible();
  for(const id of ['yield-curve','real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
 });
+
+test('annual budget histories reconcile and compare functional and revenue contributions',async({page,request})=>{
+ const composition=await (await request.get('/data/composition.json')).json();
+ await page.goto('/?page=fiscal');await page.getByText('Compare budgets over time',{exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Spending by economic category over time',exact:true})).toBeVisible();
+ await expect(page.getByRole('table',{name:'Budget change contributions',exact:true})).toContainText('Net social benefits (including pensions)');
+ await expect(page.getByRole('table',{name:'Interest and dividend bridge',exact:true})).toContainText('1.45');
+ await expect(page.getByRole('table',{name:'Interest and dividend bridge',exact:true})).toContainText('2.87');
+ await page.getByRole('combobox',{name:'Budget breakdown',exact:true}).selectOption('functional');
+ await page.getByRole('combobox',{name:'Budget comparison start',exact:true}).selectOption('2019-20');
+ await page.getByRole('combobox',{name:'Budget comparison end',exact:true}).selectOption('2025-26');
+ const first=composition.history.years.find((y:{year:string})=>y.year==='2019-20'),last=composition.history.years.find((y:{year:string})=>y.year==='2025-26');
+ const health=(y:{items:{name:string;pctGdp:number}[]})=>y.items.find(i=>i.name==='Health')!.pctGdp;
+ const table=page.getByRole('table',{name:'Budget change contributions',exact:true});await expect(table.getByRole('row').filter({hasText:'Health'})).toContainText((health(last)-health(first)).toFixed(2));
+ await expect(page.getByRole('table',{name:'TES to total spending bridge',exact:true})).toContainText('44.3');
+ await page.getByRole('combobox',{name:'Budget comparison start',exact:true}).selectOption('2007-08');await expect(page.getByRole('heading',{name:'What changed between 2007-08 and 2025-26?',exact:true})).toBeVisible();
+ await page.getByRole('combobox',{name:'Budget breakdown',exact:true}).selectOption('receipts');await expect(page.getByRole('heading',{name:'Revenue composition over time',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'Tax take versus total receipts',exact:true})).toBeVisible();
+ await page.getByRole('combobox',{name:'Budget history units',exact:true}).selectOption('share');
+ await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+});

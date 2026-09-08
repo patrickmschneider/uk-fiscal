@@ -3,6 +3,8 @@ import io
 from pathlib import Path
 import unittest
 from pipeline.fiscal import parse_pusf, parse_gdp, fetch_fiscal, ONS_URL, GDP_URL
+from pipeline.fiscal import parse_pesa_history
+import openpyxl
 
 FIXTURE=Path(__file__).parent/'fixtures/pusf-sample.csv'
 
@@ -18,6 +20,16 @@ class FiscalTests(unittest.TestCase):
     def modify(self,fn):
         rows=list(csv.reader(io.StringIO(FIXTURE.read_text())))
         fn(rows);out=io.StringIO();csv.writer(out).writerows(rows);return out.getvalue().encode()
+
+    def test_optional_tax_and_interest_receipt_codes_are_read_by_identity(self):
+        def extend(rows):
+            for i,row in enumerate(rows):
+                row.extend(['Council tax','Interest received','Total taxes'] if i==0 else ['NMHM','JW2L','AHHY'] if i==1 else ['11','22','33'] if i>=7 else ['','',''])
+        data=parse_pusf(self.modify(extend))
+        self.assertEqual(data['observations'][-1]['councilTax'],11)
+        self.assertEqual(data['observations'][-1]['interestReceipts'],22)
+        self.assertEqual(data['observations'][-1]['totalTaxes'],33)
+        self.assertEqual(data['series']['totalTaxes']['code'],'AHHY')
 
     def test_missing_month_fails(self):
         raw=self.modify(lambda rows:rows.pop(next(i for i,r in enumerate(rows) if r[0]=='2025 FEB')))
@@ -44,6 +56,49 @@ class FiscalTests(unittest.TestCase):
         a=next(r for r in before['observations'] if r['date']=='2025-01')
         b=next(r for r in after['observations'] if r['date']=='2025-01')
         self.assertEqual(b['borrowing']-a['borrowing'],235)
+
+class PESAHistoryTests(unittest.TestCase):
+    fixture = Path(__file__).parent/'fixtures/pesa-2026-chapter4.xlsx'
+
+    def modified(self, fn):
+        book = openpyxl.load_workbook(self.fixture)
+        fn(book)
+        output = io.BytesIO()
+        book.save(output)
+        return output.getvalue()
+
+    def test_official_long_run_levels_and_published_ratios(self):
+        data = parse_pesa_history(self.fixture.read_bytes())
+        self.assertEqual(len(data['years']), 23)
+        self.assertEqual(data['years'][0]['year'], '2003-04')
+        before = next(r for r in data['years'] if r['year'] == '2019-20')
+        after = data['years'][-1]
+        self.assertEqual(before['tmePctGdp'], 39.1)
+        self.assertEqual(after['tmePctGdp'], 44.3)
+        self.assertEqual(after['tme'], 1360100)
+        self.assertEqual(after['debtInterestPctGdp'], 4.2)
+        self.assertEqual(next(i['pctGdp'] for i in after['items'] if i['name'] == 'Health'), 8.4)
+        for row in data['years']:
+            self.assertAlmostEqual(sum(i['value'] for i in row['items']), row['total'])
+            self.assertAlmostEqual(sum(i['pctGdp'] for i in row['items']), row['totalPctGdp'])
+        self.assertNotIn('Debt interest', [i['name'] for i in after['items']])
+        self.assertLess(next(i['value'] for i in after['items'] if i['name'] == 'EU transactions'), 0)
+
+    def test_missing_or_misaligned_history_is_rejected(self):
+        raw = self.modified(lambda book: setattr(book['4_4']['B5'], 'value', '2002-03'))
+        with self.assertRaisesRegex(ValueError, 'discontinuous'):
+            parse_pesa_history(raw)
+        raw = self.modified(lambda book: setattr(book['4_2']['B20'], 'value', None))
+        with self.assertRaisesRegex(ValueError, 'Missing PESA history value'):
+            parse_pesa_history(raw)
+
+    def test_corrupt_bridge_and_units_are_rejected(self):
+        raw = self.modified(lambda book: setattr(book['4_4']['B27'], 'value', 80))
+        with self.assertRaisesRegex(ValueError, 'TES to TME bridge'):
+            parse_pesa_history(raw)
+        raw = self.modified(lambda book: [setattr(c, 'value', '£ million') for c in book['4_2'][3] if c.value == '£ billion'])
+        with self.assertRaisesRegex(ValueError, 'units'):
+            parse_pesa_history(raw)
 
 class GDPTests(unittest.TestCase):
     fixture = Path(__file__).parent/'fixtures/gdp-bktl.csv'
