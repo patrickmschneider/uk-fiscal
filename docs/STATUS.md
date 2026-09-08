@@ -62,3 +62,5 @@ Next: obtain owner feedback on the running local version, close the DMO coverage
 Public GitHub repository; intended GitHub Pages and Actions; no recurring paid services. One user, three tabs, progressively disclosed detail. Local-first delivery is approved. No duplicate review or source documents: definitions live in the catalogue, plan in PROJECT_PLAN.md, progress here.
 
 RPI control refinement: comparison and observation calendars now also appear directly on the RPI breakeven level chart. They share the selected dates with the pricing/change panels; a browser regression checks that the selected historical curve appears in the data table.
+
+State composition refinement: added % of named total / % of GDP selector for both functional spending and revenue sources. Named totals are TES and public-sector current receipts; GDP uses the selected full financial year (BKTL), explicitly distinguished from Treasury published GDP shares. Bars use a common 0–100% denominator scale; CSV includes the chosen denominator. Selection persists in the URL. Production build and two focused Chromium/WebKit tests pass, covering year changes, exports and accessibility.

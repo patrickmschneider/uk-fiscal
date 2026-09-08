@@ -152,3 +152,22 @@ test('RPI chart exposes its comparison calendar and updates the plotted comparis
  await expect(panel.getByRole('table')).toContainText(old.points.find((p:{tenor:number})=>p.tenor===10).rate.toFixed(2));
  await expect(page).toHaveURL(new RegExp(`pricingCompare=${old.date}`));
 });
+
+test('state composition switches named-total and matched-year GDP denominators',async({page,request},testInfo)=>{
+ const fiscal=await (await request.get('/data/fiscal.json')).json(),composition=await (await request.get('/data/composition.json')).json();
+ const annual=composition.years.at(-1),health=annual.items.find((x:{name:string})=>x.name==='Health');
+ const end=`${Number(annual.year.slice(0,4))+1}-03`,gdp=fiscal.gdp.observations.find((x:{date:string})=>x.date===end).rollingAnnualMillion;
+ await page.goto('/?page=fiscal');await page.getByText('The composition of the state',{exact:true}).click();
+ const spending=page.locator('.composition-block').filter({has:page.getByRole('heading',{name:'Spending by function',exact:true})});
+ const healthRow=spending.locator('li').filter({hasText:'Health'});
+ await expect(healthRow.locator('small')).toHaveText(`${(health.value/annual.total*100).toFixed(1)}%`);
+ await page.getByRole('combobox',{name:'Composition units',exact:true}).selectOption('gdp');
+ await expect(healthRow.locator('small')).toHaveText(`${(health.value/gdp*100).toFixed(1)}%`);
+ const csvPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download Spending by function CSV',exact:true}).click();const csv=await csvPromise;const file=testInfo.outputPath('composition-gdp.csv');await csv.saveAs(file);const text=await fs.readFile(file,'utf8');expect(text).toContain('Share of GDP (%)');expect(text).toContain(String(gdp));expect(text).toContain('ONS BKTL');
+ await page.reload();await page.getByText('The composition of the state',{exact:true}).click();await expect(page.getByRole('combobox',{name:'Composition units',exact:true})).toHaveValue('gdp');
+ const older=composition.years[0],olderGdp=fiscal.gdp.observations.find((x:{date:string})=>x.date===`${Number(older.year.slice(0,4))+1}-03`).rollingAnnualMillion;
+ await page.getByRole('combobox',{name:'Composition year',exact:true}).selectOption(older.year);
+ await expect(healthRow.locator('small')).toHaveText(`${(older.items.find((x:{name:string})=>x.name==='Health').value/olderGdp*100).toFixed(1)}%`);
+ await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+});

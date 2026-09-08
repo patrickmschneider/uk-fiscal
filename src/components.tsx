@@ -39,7 +39,12 @@ export function ChartPanel({id,title,subtitle,summary,rows,lines,xKey='label',xL
     <SourceLine sources={sources} note={note}/></section>;
 }
 
-export function CompositionBars({title,items,total,source,metadata}:{title:string;items:{name:string;value:number}[];total:number;source:Source[];metadata:string}){
- const sorted=[...items].sort((a,b)=>b.value-a.value);const max=Math.max(...items.map(i=>Math.abs(i.value)),1);
- return <section className="composition-block"><div className="panel-heading"><h3>{title}</h3><button className="plain-button" onClick={()=>downloadCsv(title.toLowerCase().replaceAll(' ','-'),['Category','£ million','Share of total (%)'],sorted.map(x=>[x.name,x.value,x.value/total*100]),metadata)} aria-label={`Download ${title} CSV`}><Download size={15}/> CSV</button></div><p className="small">Total: £{fmt(total/1000)}bn · share of named total</p><ul className="bar-list">{sorted.map(x=><li key={x.name}><div className="bar-label"><span>{x.name}</span><span>{fmt(x.value/1000)}bn <small>{fmt(x.value/total*100)}%</small></span></div><div className="bar-track"><div className={x.value<0?'negative':''} style={{width:`${Math.abs(x.value)/max*100}%`}}/></div></li>)}</ul><SourceLine sources={source} note={metadata}/></section>;
+export function CompositionBars({title,items,total,source,metadata,units='share',gdp=null,totalName='Named total',gdpNote=''}:{title:string;items:{name:string;value:number}[];total:number;source:Source[];metadata:string;units?:'share'|'gdp';gdp?:number|null;totalName?:string;gdpNote?:string}){
+ const sorted=[...items].sort((a,b)=>b.value-a.value);const denominator=units==='gdp'?gdp:total;
+ const valid=denominator!=null&&Number.isFinite(denominator)&&denominator>0;
+ const share=(value:number)=>valid?value/denominator!*100:null;
+ const shareLabel=units==='gdp'?'Share of GDP (%)':'Share of named total (%)';
+ const definition=units==='gdp'?`Denominator: ${gdpNote}. ${gdp!=null?`Nominal GDP £${fmt(gdp/1000)}bn.`:'GDP unavailable; percentages are not estimated.'}`:`Denominator: ${totalName}, £${fmt(total/1000)}bn.`;
+ const meta=`${metadata} Display: ${shareLabel}. ${definition}`;
+ return <section className="composition-block"><div className="panel-heading"><h3>{title}</h3><button className="plain-button" onClick={()=>downloadCsv(title.toLowerCase().replaceAll(' ','-'),['Category','£ million',shareLabel,'Denominator (£ million)'],sorted.map(x=>[x.name,x.value,share(x.value),valid?denominator:null]),meta)} aria-label={`Download ${title} CSV`}><Download size={15}/> CSV</button></div><p className="small">{totalName}: £{fmt(total/1000)}bn</p><p className="small">{definition} Bars use a 0–100% scale.</p><ul className="bar-list">{sorted.map(x=><li key={x.name}><div className="bar-label"><span>{x.name}</span><span>£{fmt(x.value/1000)}bn <small>{share(x.value)==null?'N/A':`${fmt(share(x.value))}%`}</small></span></div><div className="bar-track"><div className={x.value<0?'negative':''} style={{width:`${Math.min(100,Math.abs(share(x.value)||0))}%`}}/></div></li>)}</ul><SourceLine sources={source} note={meta}/></section>;
 }
