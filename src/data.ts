@@ -1,14 +1,16 @@
 export type Source = {id:string; name?:string; title?:string; publisher?:string; url:string; downloadUrl?:string; publicationDate?:string|null; observationDate?:string; retrievedAt?:string; licence?:string};
 export type Observation = {date:string; [key:string]:number|string|null};
 export type Series = {code:string;label:string;unit:string;scope:string;sourceTitle:string};
-export type Fiscal = {schemaVersion:number;asOf:string;releaseDate:string;nextRelease:string;scope:string;basis:string;sources:Source[];series:Record<string,Series>;observations:Observation[];notes:string[]};
+export type Gdp = {basis:string;sources:Source[];observations:{date:string;rollingAnnualMillion:number|null}[]};
+export type Fiscal = {schemaVersion:number;asOf:string;releaseDate:string;nextRelease:string;scope:string;basis:string;sources:Source[];series:Record<string,Series>;observations:Observation[];gdp?:Gdp;notes:string[]};
 export type Composition = {schemaVersion:number;asOf:string;unit:string;basis:string;sources:Source[];years:{year:string;total:number;items:{name:string;value:number}[]}[];notes:string[]};
 export type Forecast = {schemaVersion:number;status:string;fiscalYear?:string;vintage?:string;publicationDate?:string;cumulative?:{period:string;value:number}[];sources:Source[];notes?:string[]};
 export type Security = {isin:string;name:string;type:string;couponPct:number;maturityDate:string;nominalMillion:number;upliftedMillion:number};
 export type Auction = {date:string;isin:string;name:string;offeredMillion:number|null;allottedMillion:number|null;yieldPct:number|null;cover:number|null;tailBp:number|null;postAuctionMillion:number|null;sourceUrl?:string};
 export type Operation = {date:string;type:string;name:string;amountMillion:number|null;status:string;sourceUrl:string;datePrecision?:string};
 export type Debt = {schemaVersion:number;asOf:string;sources:Source[];securities:Security[];auctions:Auction[];calendar:Operation[];totals:{nominalMillion:number;upliftedMillion:number};availability:Record<string,unknown>;notes?:string[]};
-export type Curve = {schemaVersion:number;status?:string;asOf?:string;observationDate?:string|null;sources:Source[];curves:{date:string;points:{tenor:number;rate:number|null}[]}[];notes?:string[];reason?:string;basis?:string};
+export type CurveObservation = {date:string;points:{tenor:number;rate:number|null}[]};
+export type Curve = {schemaVersion:number;status?:string;asOf?:string;observationDate?:string|null;sources:Source[];curves:CurveObservation[];realCurves?:CurveObservation[];breakevenCurves?:CurveObservation[];notes?:string[];reason?:string;basis?:string};
 export type GroupStatus = {status:string;lastChecked:string;lastSuccess?:string;error?:string;asOf?:string;releaseId?:string};
 export type Manifest = {schemaVersion:number;generatedAt:string;groups:Record<string,GroupStatus>};
 export type Bundle = {fiscal:Fiscal;composition:Composition;debt:Debt;forecast:Forecast;curve:Curve;manifest:Manifest|null};
@@ -62,4 +64,15 @@ export function isOverdue(group:string,asOf:string,now=new Date()):boolean {
   if(group==='fiscal'){end.setUTCMonth(end.getUTCMonth()+2);end.setUTCDate(23);return now>end;}
   // A five-weekday tolerance accommodates next-business-day publication and most bank holidays.
   let weekdays=0;for(let d=new Date(end);d<now;d.setUTCDate(d.getUTCDate()+1)){if(d.getUTCDay()!==0&&d.getUTCDay()!==6)weekdays++;if(weekdays>5)return true;}return false;
+}
+
+export function gdpAt(gdp:Gdp|undefined,end:string){
+ const row=gdp?.observations.filter(r=>r.date<=end).sort((a,b)=>a.date.localeCompare(b.date)).at(-1);
+ if(!row||row.date<shiftMonth(end,-2)||typeof row.rollingAnnualMillion!=='number'||!Number.isFinite(row.rollingAnnualMillion)||row.rollingAnnualMillion<=0)return null;
+ return row;
+}
+export function flowValue(value:number|null,end:string,units:string,gdp?:Gdp):number|null {
+ if(value==null)return null;
+ if(units!=='gdp')return value/1000;
+ const denominator=gdpAt(gdp,end);return denominator?value/denominator.rollingAnnualMillion!*100:null;
 }

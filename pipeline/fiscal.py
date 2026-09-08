@@ -7,6 +7,9 @@ import openpyxl
 
 ONS_URL = 'https://www.ons.gov.uk/file?uri=/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectorfinances/current/pusf.csv'
 ONS_PAGE = 'https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/datasets/publicsectorfinances'
+GDP_PAGE = 'https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/bktl/pn2'
+GDP_URL = 'https://www.ons.gov.uk/generator?format=csv&uri=%2Feconomy%2Fgrossdomesticproductgdp%2Ftimeseries%2Fbktl%2Fpn2'
+GDP_METHOD = 'https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/methodologies/theuseofgrossdomesticproductgdpinpublicsectorfiscalratiostatistics'
 PESA_PAGE = 'https://www.gov.uk/government/statistics/public-expenditure-statistical-analyses-2026'
 PESA_URL = 'https://assets.publishing.service.gov.uk/media/6a5772f59e63154454413701/PESA_2026_CP_Chapter_5_tables.xlsx'
 SCOPE = 'UK public sector excluding public sector banks'
@@ -82,7 +85,7 @@ def parse_pusf(raw):
                 'Total managed expenditure − current receipts = net borrowing (all excluding public sector banks).',
                 'Total managed expenditure = current expenditure + consumption of fixed capital + net investment.',
                 'Selected tax details cover central government and do not form an exhaustive public-sector receipts decomposition.',
-                'GDP ratios are published ONS ratios using the ONS denominator convention, not ratios calculated by this dashboard.',
+                'Debt/GDP is the published ONS ratio; optional flow/GDP scaling is calculated by this dashboard using separately sourced nominal GDP.',
                 'All historical observations use this release vintage and are subject to revision.'],
     }
 
@@ -117,5 +120,60 @@ def parse_pesa(raw):
        'notes':['Five years on a consistent PESA 2026 classification; older vintages are not spliced into this view.',
                 'Negative EU transactions are retained, not hidden. Shares use the published TES total.']}
 
-def fetch_fiscal(fetch): return parse_pusf(fetch(ONS_URL))
+def parse_gdp(raw):
+    """Published quarterly nominal GDP; never infer it from rounded fiscal ratios."""
+    rows = list(csv.reader(io.StringIO(raw.decode('utf-8-sig'))))
+    metadata = {r[0]: r[1] for r in rows if len(r) == 2 and not re.match(r'^\d{4}', r[0])}
+    if metadata.get('CDID') != 'BKTL' or metadata.get('Source dataset ID') != 'PN2':
+        raise ValueError('Expected ONS BKTL nominal GDP from PN2')
+    if metadata.get('Title') != 'Gross Domestic Product at market prices: CP: NSA £m' or metadata.get('Unit') != 'm':
+        raise ValueError('Unexpected GDP title or units')
+    release = datetime.strptime(metadata['Release date'], '%d-%m-%Y').date().isoformat()
+    quarters = {}
+    for row in rows:
+        match = re.fullmatch(r'(\d{4}) Q([1-4])', row[0])
+        if not match:
+            continue
+        y, q = map(int, match.groups())
+        index = y * 4 + q - 1
+        if index in quarters:
+            raise ValueError('Duplicate GDP quarter')
+        value = number(row[1])
+        if value is not None and value <= 0:
+            raise ValueError('GDP must be positive')
+        quarters[index] = value
+    if len(quarters) < 8:
+        raise ValueError('Insufficient GDP quarters')
+    observations = []
+    # Missing quarters leave a null denominator rather than bridging a gap.
+    for index in range(min(quarters), max(quarters) + 1):
+        y, q0 = divmod(index, 4)
+        if y < 1999:
+            continue
+        values = [quarters.get(i) for i in range(index - 3, index + 1)]
+        observations.append({'date': f'{y:04d}-{(q0 + 1) * 3:02d}',
+                             'rollingAnnualMillion': sum(values) if all(v is not None for v in values) else None})
+    if not observations or not any(r['rollingAnnualMillion'] is not None for r in observations):
+        raise ValueError('No complete four-quarter GDP totals')
+    return {
+        'code': 'BKTL', 'asOf': observations[-1]['date'], 'releaseDate': release,
+        'nextRelease': metadata.get('Next release'), 'unit': '£ million',
+        'basis': 'Latest available four-quarter nominal GDP, current prices, not seasonally adjusted. Dashboard scaling, not an official ONS fiscal ratio.',
+        'methodologyUrl': GDP_METHOD,
+        'notes': [
+            'Sum four consecutive published BKTL quarters. No interpolation, forecast or inference from rounded debt/GDP ratios.',
+            'Scale flows by the latest quarter-end denominator at or before the flow endpoint, with at most two months of carry-forward; otherwise unavailable.',
+            'Monthly and year-to-date flows are shares of annual GDP, without annualising the numerator.',
+            'Historical GDP is the latest release vintage and may differ from the vintage underlying published fiscal ratios.'
+        ],
+        'sources': [{'id': 'ons-gdp-bktl', 'name': 'ONS · Nominal GDP (BKTL, PN2)',
+                     'url': GDP_PAGE, 'downloadUrl': GDP_URL, 'publicationDate': release,
+                     'observationDate': observations[-1]['date'], 'licence': 'Open Government Licence v3.0'}],
+        'observations': observations,
+    }
+
+def fetch_fiscal(fetch):
+    fiscal = parse_pusf(fetch(ONS_URL))
+    fiscal['gdp'] = parse_gdp(fetch(GDP_URL))
+    return fiscal
 def fetch_composition(fetch): return parse_pesa(fetch(PESA_URL))

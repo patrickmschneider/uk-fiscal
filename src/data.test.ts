@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {fiscalStart,periodsFor,total,cumulative,csvText,calendarAnniversary,operationEnd,isOverdue,type Observation} from './data';
+import {gdpAt,flowValue,fiscalStart,periodsFor,total,cumulative,csvText,calendarAnniversary,operationEnd,isOverdue,type Observation} from './data';
 describe('fiscal accounting boundaries',()=>{
  it('uses April financial years',()=>{expect(fiscalStart('2026-03')).toBe(2025);expect(fiscalStart('2026-04')).toBe(2026);expect(periodsFor('2026-03','ytd')).toHaveLength(12);expect(periodsFor('2026-04','ytd')).toEqual(['2026-04']);});
  it('requires every month, including explicit nulls',()=>{const rows:Observation[]=[{date:'2026-04',borrowing:4},{date:'2026-06',borrowing:3}];expect(total(rows,'borrowing','2026-06','ytd')).toBeNull();expect(total(rows,'borrowing','2026-04','rolling')).toBeNull();expect(total([{date:'2026-04',borrowing:null}],'borrowing','2026-04','month')).toBeNull();});
@@ -8,4 +8,11 @@ describe('fiscal accounting boundaries',()=>{
  it('uses a calendar anniversary including leap day',()=>{expect(calendarAnniversary('2026-09-06')).toBe('2027-09-06');expect(calendarAnniversary('2024-02-29')).toBe('2025-02-28');});
  it('keeps a syndication window open during its week',()=>{expect(operationEnd({date:'2026-09-07',datePrecision:'week',type:'syndication',name:'test',amountMillion:null,status:'planned',sourceUrl:''})).toBe('2026-09-13');});
  it('flags an old curve even on a current build',()=>{expect(isOverdue('curve','2026-08-01',new Date('2026-09-06'))).toBe(true);expect(isOverdue('curve','2026-09-04',new Date('2026-09-06'))).toBe(false);});
+});
+
+describe('GDP scaling',()=>{
+ const gdp={basis:'test',sources:[],observations:[{date:'2025-12',rollingAnnualMillion:2000},{date:'2026-03',rollingAnnualMillion:2400},{date:'2026-06',rollingAnnualMillion:3000}]};
+ it('uses the latest completed quarter, never a future denominator',()=>{expect(gdpAt(gdp,'2026-05')?.date).toBe('2026-03');expect(gdpAt(gdp,'2026-07')?.date).toBe('2026-06');expect(gdpAt(gdp,'2026-09')).toBeNull();});
+ it('preserves fiscal identities and does not annualise monthly/YTD flows',()=>{expect(flowValue(30,'2026-07','gdp',gdp)).toBe(1);expect(flowValue(-30,'2026-07','gdp',gdp)).toBe(-1);expect(flowValue(90,'2026-07','gdp',gdp)!-flowValue(60,'2026-07','gdp',gdp)!).toBe(flowValue(30,'2026-07','gdp',gdp));expect(flowValue(30,'2026-07','bn',gdp)).toBe(.03);});
+ it('returns missing for unknown flows or invalid GDP',()=>{expect(flowValue(null,'2026-07','gdp',gdp)).toBeNull();expect(flowValue(30,'2026-07','gdp')).toBeNull();expect(flowValue(30,'2026-07','gdp',{...gdp,observations:[{date:'2026-06',rollingAnnualMillion:0}]})).toBeNull();});
 });

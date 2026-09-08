@@ -5,3 +5,7 @@
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
 .table-hint{display:none;font-size:11px;color:#53665c;margin:12px 0 4px}@media(max-width:700px){.table-hint{display:block}.chart-actions button{min-height:44px;min-width:44px}.table-wrap td:nth-child(3){min-width:160px}}
+
+.pricing-controls{display:flex;gap:24px;flex-wrap:wrap;margin:24px 0 12px}@media(max-width:700px){nav{gap:10px}nav button{font-size:11px}.pricing-controls{gap:12px}.pricing-controls .select-label{flex-wrap:wrap}}
+
+.toolbar{gap:16px;flex-wrap:wrap}.toolbar .select-label{margin:0}@media(max-width:700px){.toolbar .select-label{margin-top:14px}}

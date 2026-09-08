@@ -1,6 +1,6 @@
 # UK Fiscal Dashboard
 
-A personal UK fiscal briefing dashboard for Patrick Schneider. The first local version has two pages: fiscal balances and breakdowns; and debt, yields, financing operations and redemptions. Charts include source notes, tables, CSV and SVG downloads.
+A personal UK fiscal briefing dashboard for Patrick Schneider. The local version has three tabs: fiscal balances and breakdowns; debt, financing operations and redemptions; and Pricing for nominal/real yield curves and RPI breakeven inflation. Charts include source notes, tables, CSV and SVG downloads.
 
 ## Run locally
 
@@ -33,7 +33,8 @@ Bank of England curve downloads are used locally under personal/internal-use ter
 - ONS public sector finances through July 2026, with reconciled receipts, expenditure and borrowing; March 2026 OBR monthly borrowing forecast via ONS.
 - HM Treasury PESA annual functional spending composition, five financial years. Its TES denominator differs from the fiscal page's TME measure.
 - DMO gilt stock dated 4 September 2026. Auction results include July 2025–June 2026 and selected later notices; July–August 2026 coverage is incomplete. The July–December financing calendar uses curated official notices and still needs source discovery when schedules change.
-- Local Bank of England nominal spot curves through 3 September 2026. These are fitted spot yields, not auction yields or borrowing-cost forecasts.
+- Local Bank of England nominal and real spot curves and matched RPI breakevens through 7 September 2026. Pricing offers saved-date comparisons and changes in basis points. Breakevens include risk and liquidity premia; they are not pure inflation expectations.
+- Fiscal headline/time-series flows can be shown in £bn or % of GDP. The denominator is the latest published four-quarter nominal GDP ending on/before each flow endpoint (at most two months earlier), with its date shown and exported. Monthly/YTD flows are not annualised; these dashboard ratios differ from official ONS fiscal ratios.
 
 The app labels definitions, observation dates and partial coverage. Refreshing a curated DMO notice does not discover newly published notices. Machine-readable source mappings and reuse notes live in `catalogue/`.
 
