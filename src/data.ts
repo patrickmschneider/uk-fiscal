@@ -13,26 +13,27 @@ export type CurveObservation = {date:string;points:{tenor:number;rate:number|nul
 export type Curve = {schemaVersion:number;status?:string;asOf?:string;observationDate?:string|null;sources:Source[];curves:CurveObservation[];realCurves?:CurveObservation[];breakevenCurves?:CurveObservation[];notes?:string[];reason?:string;basis?:string};
 export type GroupStatus = {status:string;lastChecked:string;lastSuccess?:string;error?:string;asOf?:string;releaseId?:string};
 export type Manifest = {schemaVersion:number;generatedAt:string;groups:Record<string,GroupStatus>};
-export type Bundle = {fiscal:Fiscal;composition:Composition;debt:Debt;forecast:Forecast;curve:Curve;manifest:Manifest|null};
+export type Bundle = {fiscal:Fiscal;composition:Composition;debt:Debt;forecast:Forecast;curve:Curve;manifest:Manifest|null;loadWarnings?:string[]};
 
-export async function loadBundle():Promise<Bundle> {
+export async function loadBundle(previous?:Bundle):Promise<Bundle> {
+  const loadWarnings:string[]=[];
   async function read<T>(name:string, fallback?:T):Promise<T> {
     try {
-      const response=await fetch(`${import.meta.env.BASE_URL}data/${name}.json`);
+      const response=await fetch(`${import.meta.env.BASE_URL}data/${name}.json`,{cache:'no-store'});
       if(!response.ok) throw new Error(`${name}: HTTP ${response.status}`);
       const value=await response.json();
       if(value.schemaVersion!==1) throw new Error(`${name}: unsupported data format. Refresh the app and data together.`);
       return value as T;
-    } catch(error) {if(fallback!==undefined) return fallback;throw error;}
+    } catch(error) {if(fallback!==undefined){loadWarnings.push(`${name}: ${error instanceof Error?error.message:String(error)}`);return fallback;}throw error;}
   }
   const [fiscal,composition,debt,forecast,curve,manifest]=await Promise.all([
     read<Fiscal>('fiscal'),read<Composition>('composition'),read<Debt>('debt'),
-    read<Forecast>('forecast',{schemaVersion:1,status:'unavailable',sources:[],notes:['Forecast data could not be loaded.']}),
-    read<Curve>('curve',{schemaVersion:1,status:'unavailable',sources:[],curves:[],notes:['The official yield-curve download is not yet available in this snapshot.']}),
-    read<Manifest|null>('manifest',null),
+    read<Forecast>('forecast',previous?.forecast||{schemaVersion:1,status:'unavailable',sources:[],notes:['Forecast data could not be loaded.']}),
+    read<Curve>('curve',previous?.curve||{schemaVersion:1,status:'unavailable',sources:[],curves:[],notes:['The official yield-curve download is not yet available in this snapshot.']}),
+    read<Manifest|null>('manifest',previous?.manifest||null),
   ]);
   if(!fiscal.observations?.length || !composition.years?.length || !debt.securities?.length) throw new Error('The saved data are incomplete. Run the documented data refresh.');
-  return {fiscal,composition,debt,forecast,curve,manifest};
+  return {fiscal,composition,debt,forecast,curve,manifest,loadWarnings};
 }
 
 export type Mode='ytd'|'month'|'rolling';

@@ -19,7 +19,7 @@ A usable three-tab local MVP is implemented with real official data, manual refr
 
 Independent sceptical plan review was incorporated into PROJECT_PLAN.md. Bounded independent code/data and visual-design reviews were also completed. Fixes include stable historical gilt identities, numeric curve tenors and missing-value handling, calendar-year redemption windows, week-based syndication dates, fiscal-history comparisons, export legends, mobile table cues, contrast and copy-link feedback. Reviews are recorded here rather than retained as separate documents.
 
-Final checks: production build; 10 frontend unit tests; 39 Python adapter/pipeline tests; eight Chromium/WebKit browser tests, including mobile layouts, keyboard navigation, CSV/SVG downloads and automated accessibility scans. Browser resize checks wait for responsive charts to settle. Real-source checks reconcile monthly spending less receipts to borrowing and annual composition totals within published rounding.
+Final checks: production build; 10 frontend unit tests; 39 Python adapter/pipeline tests; 12 Chromium/WebKit browser tests, including mobile layouts, keyboard navigation, CSV/SVG downloads and automated accessibility scans. Browser resize checks wait for responsive charts to settle. Real-source checks reconcile monthly spending less receipts to borrowing and annual composition totals within published rounding.
 
 ## Known limitations and next task
 
@@ -36,6 +36,12 @@ Next: obtain owner feedback on the running local version, close the DMO coverage
 - Pricing is now a separate tab with nominal and real gilt spot curves, matched RPI breakevens, arbitrary saved-date comparisons and expandable changes in basis points. Maturity axes are labelled in years, including exports. Local data extend through 7 September 2026; real/breakeven coverage starts at 2.5 years. Exact matched nominal-minus-real calculations agree with the official BoE inflation workbook to ten decimal places in the test fixture.
 - Fiscal headline and time-series flows now toggle between £bn and % of GDP, including narrative, tables and exports. GDP is published BKTL nominal NSA GDP over four quarters, at the latest quarter end on/before each endpoint (maximum two months carry-forward); monthly/YTD numerators are not annualised. This is dashboard scaling, not an official ONS fiscal ratio. Latest denominator ends June 2026 (£3,103.024bn). CSV/table exports include denominator dates and values. Forecast percentages stop at the latest fiscal outturn month, with no GDP forecast assumed. Composition remains its separately labelled share-of-total view.
 - Independent code/data review found no blocker; its narrative/denominator-export suggestions were incorporated. Mobile views and SVG export were visually checked, including the populated GDP view, alongside browser accessibility checks. A non-blocking resilience limitation remains: GDP fetch failure retains the whole previous fiscal bundle rather than promoting only fresh fiscal numerators.
+
+## Rendering and date-picker follow-up, 9 September
+
+- The saved payload contains all three curves. A stale nominal-only in-memory snapshot was identified as a reproducible cause of missing real/breakeven panels: the original app loaded JSON only once. Data reads now bypass the browser cache and reload on focus/visibility return; Pricing also offers Reload saved data and explains incomplete snapshots. This mechanism is verified in headless regression tests; the user's original screen state was not inspected.
+- An independent static review identified optional-source reload failures discarding last-good curves. Reload now retains prior curve/forecast datasets and shows the failed-read warning; a 503 regression verifies this.
+- Replaced date lists with year/month calendar controls and previous/next-month arrows. Only published observation days are selectable. Shared controls are also available inside every change panel, with selected dates retained in the URL. Keyboard Escape, mobile sizing and accessibility are covered in Chromium/WebKit tests. No screen or microphone access is needed for these checks.
 
 ## Owner feedback queued for later
 

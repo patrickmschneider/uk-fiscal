@@ -2,6 +2,15 @@ import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs/promises';
 
+async function chooseDate(page:import('@playwright/test').Page,label:string,date:string){
+ const summary=page.locator(`summary[aria-label^="${label}: "]`);await summary.click();
+ const calendar=page.getByRole('group',{name:`${label} calendar`,exact:true});
+ await calendar.getByRole('combobox',{name:`${label} year`,exact:true}).selectOption(date.slice(0,4));
+ await calendar.getByRole('combobox',{name:`${label} month`,exact:true}).selectOption(date.slice(0,7));
+ const full=new Date(`${date}T12:00:00Z`).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+ await calendar.getByRole('button',{name:full,exact:true}).click();
+}
+
 test('fiscal briefing, period controls, URL state and exports',async({page},testInfo)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/?page=fiscal');
@@ -44,8 +53,8 @@ test('Pricing compares matched curves and exports maturity-labelled changes',asy
  await expect(page.getByRole('heading',{name:'Yields and inflation pricing.'})).toBeVisible();
  await expect(page.getByRole('heading',{name:'RPI breakeven inflation',exact:true})).toBeVisible();
  await expect(page.locator('text.recharts-label:visible').filter({hasText:'Maturity (years)'})).toHaveCount(3);
- await page.getByRole('combobox',{name:'Observation date',exact:true}).selectOption(latest.date);
- await page.getByRole('combobox',{name:'Compare with',exact:true}).selectOption(previous.date);
+ await chooseDate(page,'Observation date',latest.date);
+ await chooseDate(page,'Compare with',previous.date);
  await page.getByRole('button',{name:'Show data table for RPI breakeven inflation',exact:true}).click();
  const point=latest.points.find((p:{tenor:number})=>p.tenor===10);
  await expect(page.getByRole('table',{name:'RPI breakeven inflation',exact:true})).toContainText(point.rate.toFixed(2));
@@ -60,7 +69,7 @@ test('Pricing compares matched curves and exports maturity-labelled changes',asy
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
  await page.screenshot({path:testInfo.outputPath('pricing-mobile.png'),fullPage:true});
  await page.getByRole('button',{name:'Debt & financing',exact:true}).click();await expect(page.getByRole('heading',{name:'Nominal gilt yield curve',exact:true})).toHaveCount(0);
- await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page.getByRole('combobox',{name:'Observation date',exact:true})).toHaveValue(latest.date);
+ await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page).toHaveURL(new RegExp(`pricingDate=${latest.date}`));
 });
 
 test('fiscal GDP toggle changes flows, persists and exports denominators',async({page,request},testInfo)=>{
@@ -76,4 +85,37 @@ test('fiscal GDP toggle changes flows, persists and exports denominators',async(
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
  await page.screenshot({path:testInfo.outputPath('gdp-mobile.png'),fullPage:true});
+});
+
+
+test('reload replaces a nominal-only snapshot and change calendars select historical dates',async({page,request})=>{
+ const full=await (await request.get('/data/curve.json')).json();let serveLegacy=true;
+ await page.route('**/data/curve.json',async route=>{const payload={...full};if(serveLegacy){delete payload.realCurves;delete payload.breakevenCurves;}await route.fulfill({json:payload});});
+ await page.goto('/?page=pricing');await expect(page.getByText('This snapshot contains nominal yields',{exact:false})).toBeVisible();
+ serveLegacy=false;await page.getByRole('button',{name:'Reload saved data',exact:true}).click();
+ for(const id of ['real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
+ await expect(page.getByText('This snapshot contains nominal yields',{exact:false})).toHaveCount(0);
+ await page.getByText('Nominal gilt yield curve: change in basis points',{exact:true}).click();
+ const earlier=full.curves[20],later=full.curves[100];
+ await chooseDate(page,'Nominal gilt yield curve: observation date',later.date);
+ await chooseDate(page,'Nominal gilt yield curve: compare with',earlier.date);
+ await expect(page).toHaveURL(new RegExp(`pricingDate=${later.date}.*pricingCompare=${earlier.date}`));
+ await page.getByRole('button',{name:'Show data table for Nominal gilt yield curve change',exact:true}).click();
+ const ten=(c:{points:{tenor:number;rate:number}[]})=>c.points.find(p=>p.tenor===10)!.rate;
+ await expect(page.getByRole('table',{name:'Nominal gilt yield curve change',exact:true})).toContainText(((ten(later)-ten(earlier))*100).toFixed(2));
+ await page.locator('summary[aria-label^="Compare with: "]').click();const calendar=page.getByRole('group',{name:'Compare with calendar',exact:true});
+ await expect(calendar.locator('.calendar-grid button:disabled').first()).toBeDisabled();
+ const month=calendar.getByRole('combobox',{name:'Compare with month',exact:true});const before=await month.inputValue();await calendar.getByRole('button',{name:'Compare with: next month',exact:true}).click();await expect(month).not.toHaveValue(before);
+ await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+ await page.keyboard.press('Escape');await expect(calendar).not.toBeVisible();
+});
+
+
+test('failed curve reload preserves all last-good pricing curves',async({page})=>{
+ await page.goto('/?page=pricing');await expect(page.locator('[aria-labelledby="breakeven-title"] .recharts-line-curve').first()).toBeVisible();
+ await page.route('**/data/curve.json',route=>route.fulfill({status:503,body:'temporarily unavailable'}));
+ await page.getByRole('button',{name:'Reload saved data',exact:true}).click();
+ await expect(page.getByText('Some saved data could not be loaded.',{exact:false})).toBeVisible();
+ for(const id of ['yield-curve','real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
 });
