@@ -4,7 +4,7 @@ Updated: 9 September 2026.
 
 ## Current state
 
-A usable three-tab local MVP is implemented with real official data, manual refresh, local vintage capture and downloadable charts/data. It has not been deployed. See the README for startup and refresh commands.
+The three-tab MVP is live at https://patrickmschneider.github.io/uk-fiscal/ with real official data and downloadable charts/data. GitHub Pages serves it over HTTPS. Daily GitHub Actions refreshes and a durable `data-history` branch are configured; the first cloud source refresh is under verification. See README for local use, manual refresh and rollback.
 
 ## Milestones
 
@@ -26,10 +26,10 @@ Final checks: production build; 14 frontend unit tests; 43 Python adapter/pipeli
 - DMO auction results have a July–August 2026 gap, with selected subsequent notices. Complete aggregate result discovery and replace curated calendar notice discovery before calling M3 fully accepted. Repeated downloads alone do not make calendar discovery current.
 - Annual functional history now spans 2003-04–2025-26 on the PESA 2026 vintage. Published classification breaks are labelled; the exact five-year functional snapshot remains available separately.
 - Owner authorised public non-commercial use of the fitted BoE curve outputs on 9 September, accepting the reuse uncertainty with attribution. The former project publication hold is removed; this is not specific permission from the Bank. Curve outputs are tracked, original workbooks remain local. Attribution is shown in-app and in CSV/SVG exports; details in catalogue/boe.json.
-- Vintages currently live only in the local ignored archive. M4 must add durable remote preservation, CI refresh, failure monitoring and hosted-path testing.
-- Production build flags a large chart-library bundle; acceptable for this local version, revisit if hosted performance warrants it.
+- Compact normalized vintages and checksum metadata are preserved remotely on `data-history`; original workbooks remain local. The live `deployment.json` identifies the deployed code/data pair; archive `latest.json` can describe an attempted build.
+- Production build flags a large chart-library bundle; acceptable for this personal dashboard, revisit if hosted performance warrants it.
 
-Next: obtain owner feedback on the running local version, close the DMO coverage/discovery gaps, then implement the separate hosting milestone. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
+Next: use the hosted app across devices, then close the DMO coverage/discovery gaps. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
 
 ## Owner refinements delivered, 9 September
 
@@ -66,3 +66,9 @@ RPI control refinement: comparison and observation calendars now also appear dir
 State composition refinement: added % of named total / % of GDP selector for both functional spending and revenue sources. Named totals are TES and public-sector current receipts; GDP uses the selected full financial year (BKTL), explicitly distinguished from Treasury published GDP shares. Bars use a common 0–100% denominator scale; CSV includes the chosen denominator. Selection persists in the URL. Production build and two focused Chromium/WebKit tests pass, covering year changes, exports and accessibility.
 
 Stacked-chart design refinement: replaced the muddy palette with stable name-based categorical colours adapted from Tableau 10; navy replaces its grey substantive category, while residuals, EU transactions and rounding use neutrals. Debt stacks use blue/orange. Thin white segment boundaries and matching filled-square legends also apply to SVG exports. Independent static design advice incorporated; rendered functional chart and export inspected in an isolated headless browser. Production build and four focused Chromium/WebKit checks passed. No user-screen or microphone access.
+
+## Hosting verification, 9 September
+
+GitHub Pages deployment succeeded. Production-path and actual public-site checks passed in Chromium and WebKit: all three tabs, direct URL/reload, GDP units, nominal/real/breakeven rendering, attributed CSV/SVG downloads, 375px layout, accessibility and no browser errors. Simulated source failure shows a warning while retained charts render. Local checks: 14 frontend tests, 48 Python tests and production build pass. Cloud checks skip the two private-workbook tests; synthetic adapter tests remain active.
+
+Migrated 11 local normalized release vintages and metadata into the durable remote archive (~1.55 MB compressed); verified recovery of all six current JSON files byte-for-byte in an isolated temporary directory. Independent automation/permissions review found no blockers. A failed archive, validation, build or browser check prevents publication; partial source failure publishes retained validated data with a visible warning and then marks the workflow failed.

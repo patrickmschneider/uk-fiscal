@@ -6,7 +6,7 @@ A personal UK fiscal briefing dashboard for Patrick Schneider. The app has three
 
 [Open the dashboard](https://patrickmschneider.github.io/uk-fiscal/). GitHub Pages serves the app over HTTPS; no login, backend or paid subscription is required. The app and data are public.
 
-The **Publish dashboard** GitHub Actions workflow deploys pushes to `main` and checks official sources daily at 13:17 UTC (GitHub schedules may run late). For an immediate refresh, open the repository’s Actions tab, select that workflow, and choose **Run workflow** with refresh enabled. A source failure retains validated previous data, displays its failure status, and marks the run failed after deploying. Enable repository Actions notifications in your GitHub notification settings if you want failure emails. GitHub can disable schedules on inactive public repositories after 60 days; re-enable the workflow if that happens.
+The **Publish dashboard** GitHub Actions workflow deploys pushes to `main` and checks official sources daily at 13:17 UTC (13:17 London winter / 14:17 summer; GitHub schedules may run late). For an immediate refresh, open the repository’s Actions tab, select that workflow, and choose **Run workflow** with refresh enabled. A source failure retains validated previous data, displays its failure status, and marks the run failed after deploying. Enable repository Actions notifications in your GitHub notification settings if you want failure emails. GitHub can disable schedules on inactive public repositories after 60 days; re-enable the workflow if that happens.
 
 The DMO calendar/notices and OBR forecast vintage still require maintenance when new publications appear; the daily job does not eliminate the documented coverage gaps.
 
@@ -69,7 +69,7 @@ Personal website integration remains outside scope.
 
 ## Archive and rollback
 
-Every build preserves a checksummed bundle on `data-history` before deployment. `deployment.json` on the live site identifies its snapshot and application commit. Archives contain compressed normalized data and source-checksum metadata, not original source workbooks. Git history preserves previous `latest.json` pointers.
+Every build preserves a checksummed bundle on `data-history` before deployment. `deployment.json` on the live site identifies its snapshot and application commit. Archives contain compressed normalized data and source-checksum metadata, not original source workbooks. Git history preserves previous `latest.json` pointers. The archive pointer describes the latest build attempt; the live `deployment.json` is authoritative for what actually deployed.
 
 To rehearse recovery without touching the working app, clone the archive branch and restore into a temporary folder:
 
