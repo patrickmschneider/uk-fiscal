@@ -1,0 +1,28 @@
+// Tableau 10 categorical hues; residuals/accounting items are intentionally neutral.
+// Name-based assignment keeps each category stable across year/unit selections.
+export const budgetColours:Record<string,string>={
+ 'Goods & services':'#4E79A7',
+ 'Net social benefits (including pensions)':'#F28E2B',
+ 'Interest & dividends paid':'#B07AA1',
+ 'Net investment':'#76B7B2',
+ 'Depreciation':'#E15759',
+ 'Income tax & capital gains tax':'#4E79A7',
+ 'Compulsory social contributions':'#F28E2B',
+ 'VAT':'#76B7B2',
+ 'Corporation tax (gross of credits)':'#B07AA1',
+ 'Council tax':'#E15759',
+ 'General public services':'#B07AA1',
+ 'Defence':'#9C755F',
+ 'Public order and safety':'#E15759',
+ 'Economic affairs':'#264653',
+ 'Environment protection':'#59A14F',
+ 'Housing and community amenities':'#EDC948',
+ 'Health':'#4E79A7',
+ 'Recreation, culture and religion':'#FF9DA7',
+ 'Education':'#76B7B2',
+ 'Social protection':'#F28E2B',
+ 'Other spending & accounting residual':'#B8BDC4',
+ 'Other receipts & accounting differences':'#B8BDC4',
+ 'EU transactions':'#59636E',
+ 'Rounding adjustment':'#E3E6EA',
+};
