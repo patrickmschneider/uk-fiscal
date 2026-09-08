@@ -4,7 +4,7 @@ Updated: 9 September 2026.
 
 ## Current state
 
-The three-tab MVP is live at https://patrickmschneider.github.io/uk-fiscal/ with real official data and downloadable charts/data. GitHub Pages serves it over HTTPS. Daily GitHub Actions refreshes and a durable `data-history` branch are configured; the first cloud source refresh is under verification. See README for local use, manual refresh and rollback.
+The three-tab MVP is live at https://patrickmschneider.github.io/uk-fiscal/ with real official data and downloadable charts/data. GitHub Pages serves it over HTTPS. Daily GitHub Actions refreshes and a durable `data-history` branch are configured; all five source groups have refreshed successfully from GitHub runners. See README for local use, manual refresh and rollback.
 
 ## Milestones
 
@@ -12,7 +12,7 @@ The three-tab MVP is live at https://patrickmschneider.github.io/uk-fiscal/ with
 - [x] M1: representative official-source validation and accounting reconciliation, with limitations below.
 - [x] M2: fiscal page working locally with real data.
 - [ ] M3: local implementation is usable and reviewed; full recent-auction coverage and reliable calendar discovery remain acceptance gaps.
-- [ ] M4: hosted release, automated refresh and durable remote archives.
+- [x] M4: hosted release, automated refresh and durable remote archives.
 - [ ] M5: owner feedback and refinement; can begin now.
 
 ## Validation and review
@@ -72,3 +72,5 @@ Stacked-chart design refinement: replaced the muddy palette with stable name-bas
 GitHub Pages deployment succeeded. Production-path and actual public-site checks passed in Chromium and WebKit: all three tabs, direct URL/reload, GDP units, nominal/real/breakeven rendering, attributed CSV/SVG downloads, 375px layout, accessibility and no browser errors. Simulated source failure shows a warning while retained charts render. Local checks: 14 frontend tests, 48 Python tests and production build pass. Cloud checks skip the two private-workbook tests; synthetic adapter tests remain active.
 
 Migrated 11 local normalized release vintages and metadata into the durable remote archive (~1.55 MB compressed); verified recovery of all six current JSON files byte-for-byte in an isolated temporary directory. Independent automation/permissions review found no blockers. A failed archive, validation, build or browser check prevents publication; partial source failure publishes retained validated data with a visible warning and then marks the workflow failed.
+
+The first cloud run exposed a removed DMO April–June 2026 review URL. The replacement official document was validated and the catalogue repaired; the next cloud run refreshed all five groups successfully, advancing DMO stock to 7 September. The real failure run confirmed partial publication preserves data and ends with a failed workflow notification. Remote-archive recovery also reproduced the actual live deployment byte-for-byte, with its application commit verified.

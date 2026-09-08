@@ -261,14 +261,14 @@ Use fixtures for routine CI; keep scheduled live-source health checks separate s
 
 ### Hosted release completion checklist (M4)
 
-- [ ] All local criteria still pass; chart export is usable and includes provenance.
-- [ ] Both pages work at the public Pages URL with direct navigation/reloads under the project path.
-- [ ] Scheduled and manual Actions refreshes succeed; source access has been verified from the runner.
-- [ ] Local vintages have been migrated to durable remote archives and verified; no reliance on local disks or expiring artifacts.
-- [ ] Source-failure and workflow-failure scenarios retain valid data and reveal staleness.
-- [ ] Partial publication preserves failure notifications; code-only deploy and rollback enforce compatible code/data versions.
-- [ ] Independent automation/permissions review, deployed browser regression and rollback rehearsal pass.
-- [ ] Owner receives the hosted URL and concise maintenance instructions. Multi-device access is verified.
+- [x] All local criteria still pass; chart export is usable and includes provenance.
+- [x] All three tabs work at the public Pages URL with direct navigation/reloads under the project path.
+- [x] Scheduled refresh is configured; the same workflow succeeds when manually dispatched, with every source verified from the runner.
+- [x] Local vintages have been migrated to durable remote archives and verified; no reliance on local disks or expiring artifacts.
+- [x] Source-failure and workflow-failure scenarios retain valid data and reveal staleness.
+- [x] Partial publication preserves failure notifications; code-only deploy and rollback enforce compatible code/data versions.
+- [x] Independent automation/permissions review, deployed browser regression and rollback rehearsal pass.
+- [x] Owner receives the hosted URL and concise maintenance instructions. Desktop and mobile browser layouts are verified; owner device checks can follow.
 
 ## 11. Future extensions: direction, not committed scope
 
