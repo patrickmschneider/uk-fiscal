@@ -97,12 +97,14 @@ def refresh(groups=GROUPS,offline=False,root=ROOT,adapters=None):
         try:
             data=adapters[group](fetcher)
             release=promote(group,data,fetcher,root)
-            manifest['groups'][group]={'status':'success','lastChecked':stamp(),'lastSuccess':stamp(),'asOf':data.get('asOf') or data.get('observationDate') or data.get('publicationDate'),'releaseId':release,'mode':'archive replay' if offline else 'source download'}
+            manifest['groups'][group]={'status':'success','outcome':'unchanged' if previous.get('releaseId')==release else 'new','lastChecked':stamp(),'lastSuccess':stamp(),'asOf':data.get('asOf') or data.get('observationDate') or data.get('publicationDate'),'releaseId':release,'mode':'archive replay' if offline else 'source download'}
             print(f'{group}: validated and saved',flush=True)
         except Exception as exc:
             manifest['groups'][group]={**previous,'status':'failed','lastChecked':stamp(),'error':str(exc)}
             failed.append(group);print(f'{group}: FAILED; retained last saved data. {exc}',flush=True)
-        manifest['generatedAt']=stamp();atomic(path,encode(manifest))
+        manifest['generatedAt']=stamp()
+        if os.environ.get('UK_FISCAL_CODE_SHA'):manifest['applicationCommit']=os.environ['UK_FISCAL_CODE_SHA']
+        atomic(path,encode(manifest))
     return failed
 
 def main():

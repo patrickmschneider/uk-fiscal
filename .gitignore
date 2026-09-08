@@ -15,3 +15,7 @@ test-results/
 playwright-report/
 # Keep original downloaded BoE workbooks local; attributed curve outputs are tracked.
 data/fixtures/boe/
+
+.preview/
+.host-history/
+public/deployment.json

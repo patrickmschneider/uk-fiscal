@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:browser": "playwright test",
     "test:data": "python3 -m unittest discover -s tests -p 'test_*.py'",
-    "refresh": "python3 -m pipeline.refresh"
+    "refresh": "python3 -m pipeline.refresh",
+    "test:hosted": "HOSTED_SMOKE=1 playwright test"
   },
   "dependencies": {
     "lucide-react": "0.577.0",

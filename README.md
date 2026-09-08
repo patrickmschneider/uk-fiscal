@@ -1,6 +1,14 @@
 # UK Fiscal Dashboard
 
-A personal UK fiscal briefing dashboard for Patrick Schneider. The local version has three tabs: fiscal balances and breakdowns; debt, financing operations and redemptions; and Pricing for nominal/real yield curves and RPI breakeven inflation. Charts include source notes, tables, CSV and SVG downloads.
+A personal UK fiscal briefing dashboard for Patrick Schneider. The app has three tabs: fiscal balances and breakdowns; debt, financing operations and redemptions; and Pricing for nominal/real yield curves and RPI breakeven inflation. Charts include source notes, tables, CSV and SVG downloads.
+
+## Hosted app
+
+[Open the dashboard](https://patrickmschneider.github.io/uk-fiscal/). GitHub Pages serves the app over HTTPS; no login, backend or paid subscription is required. The app and data are public.
+
+The **Publish dashboard** GitHub Actions workflow deploys pushes to `main` and checks official sources daily at 13:17 UTC (GitHub schedules may run late). For an immediate refresh, open the repository’s Actions tab, select that workflow, and choose **Run workflow** with refresh enabled. A source failure retains validated previous data, displays its failure status, and marks the run failed after deploying. Enable repository Actions notifications in your GitHub notification settings if you want failure emails. GitHub can disable schedules on inactive public repositories after 60 days; re-enable the workflow if that happens.
+
+The DMO calendar/notices and OBR forecast vintage still require maintenance when new publications appear; the daily job does not eliminate the documented coverage gaps.
 
 ## Run locally
 
@@ -11,7 +19,7 @@ npm ci
 npm run dev
 ```
 
-Open the local address printed by Vite. The included official-data snapshots let the app run immediately. This local address is available on the computer running it; public hosting and scheduled updates are a subsequent milestone.
+Open the local address printed by Vite. The included official-data snapshots let the app run immediately. The local address works on the computer running it. The hosted app works across devices.
 
 ## Refresh data
 
@@ -24,7 +32,7 @@ pip install -r requirements.txt
 python -m pipeline.refresh
 ```
 
-Use `--group fiscal`, `--group composition`, `--group debt`, `--group forecast` or `--group curve` for an individual source group. `--offline` replays locally archived downloads; `--validate` checks saved data. A failed group keeps its last good dataset, records the failure and returns a nonzero exit code. Downloads and release vintages are retained in ignored `data/archive/`; back up that directory if you need those vintages. Remote durable archives are planned with hosting.
+Use `--group fiscal`, `--group composition`, `--group debt`, `--group forecast` or `--group curve` for an individual source group. `--offline` replays locally archived downloads; `--validate` checks saved data. A failed group keeps its last good dataset, records the failure and returns a nonzero exit code. Downloads and release vintages are retained in ignored `data/archive/`; back up that directory if you need those vintages. Compact normalized vintages and input-checksum metadata are also preserved on the remote `data-history` branch. Raw source downloads remain local.
 
 The repository includes fitted Bank of England curve outputs for this non-commercial academic dashboard, under the owner’s explicit decision to proceed with attribution despite unresolved reuse wording. This is not a claim of Open Government Licence coverage or specific Bank permission. The app and exports credit the Bank and its stated Bloomberg/Tradeweb inputs, distinguish dashboard calculations and disclaim endorsement. Original downloaded workbooks remain local. Run `python -m pipeline.refresh --group curve` to update the saved curves.
 
@@ -57,4 +65,17 @@ Run the development server first and set `APP_URL` to its printed address. Brows
 - [Implementation plan and future extensions](docs/PROJECT_PLAN.md)
 - [Progress, limitations and next task](docs/STATUS.md)
 
-The intended hosted version uses GitHub Pages and GitHub Actions with no recurring paid services. Personal website integration remains outside scope.
+Personal website integration remains outside scope.
+
+## Archive and rollback
+
+Every build preserves a checksummed bundle on `data-history` before deployment. `deployment.json` on the live site identifies its snapshot and application commit. Archives contain compressed normalized data and source-checksum metadata, not original source workbooks. Git history preserves previous `latest.json` pointers.
+
+To rehearse recovery without touching the working app, clone the archive branch and restore into a temporary folder:
+
+```sh
+git clone --branch data-history --single-branch https://github.com/patrickmschneider/uk-fiscal.git /tmp/uk-fiscal-history
+python -m pipeline.archive_history --destination /tmp/uk-fiscal-history --restore SNAPSHOT_ID --root /tmp/uk-fiscal-restore
+```
+
+The command verifies all six datasets and reports `requiredCodeSha`. For a production rollback, recover that application commit in an isolated checkout, restore the matching snapshot (use `--code-sha` to enforce the match), and run the build and tests. Commit the recovered code/data to `main` while preserving the publishing workflow; the normal push deploys that pair without refreshing it first. Avoid force-pushing.
