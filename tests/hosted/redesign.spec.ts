@@ -98,7 +98,7 @@ test('overview composition sits before pricing and compares selected years on co
  const data=await(await request.get('data/composition.json')).json();const last=data.history.years.at(-1),first=data.history.years.find((y:{year:string})=>y.year==='2019-20');
  const health=(y:{items:{name:string;pctGdp:number;value:number}[]})=>y.items.find(r=>r.name==='Health')!;
  await page.goto('./');const section=page.locator('.overview-composition');await expect(section).toBeVisible();
- const positions=await page.evaluate(()=>['.overview-position-pair','.overview-composition','.overview-market'].map(s=>document.querySelector(s)!.getBoundingClientRect().top));expect(positions[0]).toBeLessThan(positions[1]);expect(positions[1]).toBeLessThan(positions[2]);
+ const positions=await page.evaluate(()=>['.overview-position-pair','.overview-composition','.overview-deficits','.overview-market'].map(s=>document.querySelector(s)!.getBoundingClientRect().top));expect(positions[0]).toBeLessThan(positions[1]);expect(positions[1]).toBeLessThan(positions[2]);expect(positions[2]).toBeLessThan(positions[3]);
  const row=section.locator('li').filter({hasText:'Health'});await expect(row).toContainText(health(last).pctGdp.toFixed(2));
  await section.getByRole('button',{name:'Change between years',exact:true}).click();await expect(section.getByRole('combobox',{name:'Compare from',exact:true})).toHaveValue('2019-20');await expect(row).toContainText((health(last).pctGdp-health(first).pctGdp).toFixed(2));
  await section.getByRole('combobox',{name:'Composition units',exact:true}).selectOption('bn');await expect(row).toContainText(((health(last).value-health(first).value)/1000).toFixed(2));

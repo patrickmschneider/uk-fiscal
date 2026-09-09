@@ -38,3 +38,5 @@ fieldset{border:1px solid var(--border);padding:12px 16px;margin:16px 0;font-siz
 @media(max-width:700px){.overview-composition .composition-grid{gap:14px}.overview-composition .pricing-controls{gap:14px}}
 .composition-zero{position:absolute;top:-2px;height:11px;border-left:1px solid #65746b}
 .overview-deficits{border-top:1px solid var(--border);padding:12px 0}.overview-deficits .composition-grid{gap:28px}.overview-deficits .chart-panel{min-width:0}.overview-deficits .panel-heading{flex-wrap:wrap}
+
+.overview-deficit-origins{border-top:1px solid var(--border);padding:12px 0 18px}.overview-deficit-origins>.overview-composition,.overview-deficit-origins>.overview-deficits{border-top:0}.overview-deficit-origins>.overview-composition{padding-top:0}.overview-deficit-origins>.overview-deficits{padding-top:8px}.overview-deficit-origins>.overview-composition>.section-heading h3,.overview-deficit-origins>.overview-deficits>.section-heading h3{font-size:18px;margin:0 0 12px}
