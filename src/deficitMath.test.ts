@@ -1,5 +1,5 @@
 import {it,expect} from 'vitest';
-import {deficitParts} from './deficitMath';
+import {deficitParts,deficitHistoryRows} from './deficitMath';
 import type {OutlookRow} from './policyData';
 it('reconciles both deficit identities and preserves primary surpluses',()=>{
  const row={borrowingBn:50,interestBn:80,structuralBorrowingBn:40,gdpBn:2000,structuralPrimaryBalancePct:2} as OutlookRow;
@@ -9,4 +9,13 @@ it('reconciles both deficit identities and preserves primary surpluses',()=>{
 it('does not manufacture structural estimates or GDP denominators',()=>{
  const row={borrowingBn:50,interestBn:20,gdpBn:null,structuralPrimaryBalancePct:null} as OutlookRow;
  expect(deficitParts(row,'gdp').total).toBeNull();expect(deficitParts(row,'bn').primary).toBe(30);expect(deficitParts(row,'bn').cyclical).toBeNull();expect(deficitParts(row,'bn').structuralPrimary).toBeNull();
+});
+
+it('extends totals without inventing comparable components or overwriting vintage rows',()=>{
+ const historic=[{year:'1999-00',borrowingBn:1},{year:'2000-01',borrowingBn:10,interestBn:3,structuralBorrowingBn:4},{year:'2024-25',borrowingBn:999}] as OutlookRow[];
+ const vintage=[{year:'2024-25',borrowingBn:20,interestBn:8}] as OutlookRow[];
+ const result=deficitHistoryRows(historic,vintage,'2000');
+ expect(result.map(r=>r.year)).toEqual(['2000-01','2024-25']);
+ expect(result[0].borrowingBn).toBe(10);expect(result[0].interestBn).toBeNull();expect(result[0].structuralBorrowingBn).toBeNull();
+ expect(result[1].borrowingBn).toBe(20);expect(result[1].interestBn).toBe(8);
 });

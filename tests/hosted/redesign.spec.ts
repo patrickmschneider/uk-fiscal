@@ -113,6 +113,16 @@ test('deficit decompositions reconcile and distinguish forecasts and structural 
  const data=await(await request.get('data/outlook.json')).json();const v=data.vintages.find((x:{id:string})=>x.id==='2026-03'),r=v.rows[1];
  await page.goto('./?page=fiscal&section=deficits&units=bn');await expect(page.getByRole('heading',{name:'Deficit decomposition.',exact:true})).toBeVisible();
  await expect(page.locator('[aria-labelledby="deficit-primary-title"] .recharts-line-curve')).toBeVisible();
+ const chart=page.locator('[aria-labelledby="deficit-primary-title"]');
+ await expect(chart.locator('.recharts-reference-area')).toBeVisible();
+ await expect(chart.getByText('Forecast',{exact:true})).toBeVisible();
+ await page.getByRole('combobox',{name:'Deficit display',exact:true}).selectOption('net');
+ await expect(chart.locator('.recharts-bar')).toHaveCount(0);
+ await expect(chart.locator('.recharts-line-curve')).toBeVisible();
+ await page.getByRole('combobox',{name:'Deficit display',exact:true}).selectOption('components');
+ await expect(chart.locator('.recharts-bar')).toHaveCount(2);
+ await page.getByRole('combobox',{name:'History',exact:true}).selectOption('all');
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText('total only');
  const table=page.getByRole('table',{name:'Deficit reconciliation',exact:true}),row=table.getByRole('row').filter({hasText:r.year});
  await expect(row).toContainText((r.borrowingBn-r.interestBn).toFixed(2));await expect(row).toContainText((r.borrowingBn-r.structuralBorrowingBn).toFixed(2));await expect(row).toContainText('Forecast');
  await page.getByRole('combobox',{name:'Deficit units',exact:true}).selectOption('gdp');await expect(row).toContainText(((r.borrowingBn-r.structuralBorrowingBn)/r.gdpBn*100).toFixed(2));
