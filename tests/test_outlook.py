@@ -36,6 +36,9 @@ class OutlookTests(unittest.TestCase):
         self.assertEqual(current['rows'][-1]['debtPct'],95.1)
         self.assertEqual(current['rows'][-2]['currentBudgetDeficitBn'],-23.6)
         self.assertEqual(current['rows'][1]['structuralPrimaryBalancePct'],-.9)
+        self.assertEqual(current['rows'][1]['structuralBorrowingPct'],3.9)
+        self.assertEqual(current['rows'][1]['structuralBorrowingBn'],117.9)
+        self.assertEqual(current['rows'][1]['outputGapPct'],-.8)
         self.assertEqual(current['rows'][2]['gdpDeflatorGrowth'],2.0)
 
     def test_reconstructed_vintage_keeps_previous_assumptions(self):

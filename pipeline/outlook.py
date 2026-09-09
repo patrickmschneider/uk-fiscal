@@ -48,6 +48,9 @@ def parse_efo(raw):
       'netInvestmentBn':(9,r'Public sector net investment'),
       'primaryDeficitPct':(9,r'Primary deficit'),
       'structuralPrimaryDeficitPct':(9,r'Cyclically adjusted primary deficit'),
+      'structuralBorrowingPct':(9,r'Cyclically adjusted net borrowing'),
+      'structuralBorrowingBn':(9,r'Cyclically adjusted net borrowing'),
+      'outputGapPct':(9,r'Memo: output gap \(per cent of GDP\)'),
       'gdpBn':(3,r'Nominal GDP \(£ billion\)1,2'),
       'debtGdpBn':(3,r'Nominal GDP \(centred end-March £bn\)1,3'),
       'realGdpGrowth':(3,r'Real GDP'),
@@ -59,8 +62,17 @@ def parse_efo(raw):
       'bankRate':(3,r'Bank Rate \(per cent\)'),
       'giltYield':(3,r'Market gilt rates \(per cent\)9'),
     }
-    current={key:vector(table(t),label) for key,(t,label) in specs.items()}
-    previous={key:[round(a-b,6) for a,b in zip(current[key],vector(table(t+1).split('Other deficit measures')[0] if key=='netFinancialLiabilitiesPct' else table(t+1), label.replace(r' \(per cent\)', '') if key in ('bankRate','giltYield') else label))] for key,(t,label) in specs.items()}
+    def read_series(key,t,label):
+        text=table(t)
+        if key in ('structuralBorrowingPct','structuralBorrowingBn'):
+            parts=text.split('International comparisons')
+            if len(parts)!=2:raise ValueError('OBR fiscal aggregate sections missing')
+            text=parts[0 if key.endswith('Pct') else 1]
+        elif key=='netFinancialLiabilitiesPct':text=text.split('Other deficit measures')[0]
+        if t==4 and key in ('bankRate','giltYield'):label=label.replace(r' \(per cent\)', '')
+        return vector(text,label)
+    current={key:read_series(key,t,label) for key,(t,label) in specs.items()}
+    previous={key:[round(a-b,6) for a,b in zip(current[key],read_series(key,t+1,label))] for key,(t,label) in specs.items()}
     vintages=[]
     for id,label,date,values,reconstructed in [('2025-11','November 2025 (reconstructed)','2025-11-26',previous,True),('2026-03','March 2026','2026-03-03',current,False)]:
         rows=[]
@@ -146,6 +158,8 @@ def validate_outlook(data):
             for key in ('borrowingBn','borrowingPct','debtPct','receiptsBn','spendingBn','interestBn','gdpBn'):
                 value=row.get(key)
                 if not isinstance(value,(int,float)) or not math.isfinite(value):raise ValueError(f'Invalid outlook {key}')
+            for key in ('structuralBorrowingBn','structuralBorrowingPct','outputGapPct'):
+                if key in row and (not isinstance(row[key],(int,float)) or not math.isfinite(row[key])):raise ValueError(f'Invalid outlook {key}')
             if row['gdpBn']<=0:raise ValueError('Nonpositive GDP')
             if abs(row['spendingBn']-row['receiptsBn']-row['borrowingBn'])>1.6:raise ValueError('Forecast borrowing identity failed')
             expected='forecast' if row['year']>=v['forecastStart'] else 'outturn'

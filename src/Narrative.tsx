@@ -1,6 +1,7 @@
 import {type ReactNode} from 'react';
 import {ChartPanel,DataTable,Disclosure,SourceLine,type ChartRow} from './components';
 import {bn,fmt,total,flowValue,gdpAt,dateLabel,fiscalStart,type Bundle,type Source} from './data';
+import {Deficits} from './Deficits';
 import {OverviewComposition} from './OverviewComposition';
 import {latestVintage,forecastHistoryRows,impulse,forecastBridge,canCompareProfilePeriod,type Vintage,type OutlookRow} from './policyData';
 
@@ -47,6 +48,7 @@ export function Briefing({bundle}:{bundle:Bundle}){
  return <div className="editorial overview"><header className="briefing-lead"><p className="eyebrow">UK PUBLIC FINANCES · {dateLabel(fiscal.asOf)}</p><h1>The fiscal position.</h1><p className="lead-sentence">{headlineBorrowing?`Borrowing was ${headlineBorrowing} over the 12 months to ${dateLabel(fiscal.asOf)}`:'Rolling annual borrowing is unavailable'}{delta!=null?`, ${unit==='bn'?`£${fmt(Math.abs(delta))}bn`:`${fmt(Math.abs(delta))} percentage points`} ${delta>=0?'higher':'lower'} than a year earlier`:''}. {headlineDebt?`Debt stood at ${headlineDebt} at ${dateLabel(fiscal.asOf)}.`:''}</p></header>
  <div className="overview-tools"><UnitChoice unit={unit} setUnit={setUnit}/><ViewLink href="?page=fiscal&section=composition">Spending & tax composition →</ViewLink><ViewLink href="?page=pricing">Compare yield curves →</ViewLink></div>
  <div className="composition-grid overview-position-pair"><ChartPanel id="overview-position" title="Spending and receipts" summary="Rolling 12-month totals on a common basis. The gap is public-sector net borrowing." rows={positionRows} lines={[{key:'spending',label:'Total managed expenditure',colour:'#a76232'},{key:'receipts',label:'Current receipts',colour:'#175d65'}]} unit={unit==='bn'?'£bn':'% GDP'} xLabel="Month ending the 12-month period" sources={[...fiscal.sources.slice(0,1),...(fiscal.gdp?.sources||[])]} note="PSNB excluding public sector banks. GDP ratios use the latest four-quarter nominal GDP ending on or before the flow endpoint, with at most a two-month lag. Debt uses the official ONS stock and ratio."/><ChartPanel id="overview-debt" title="Total public-sector net debt" summary={`${dateLabel(fiscal.asOf)} · ${fmt(latest?.debtPct as number)}% of GDP. Public sector excluding banks; net debt, not gross gilt principal.`} rows={positionRows.map(point=>{const r=fiscal.observations.find(r=>r.date===point.label)!;return {label:r.date,debt:unit==='bn'?(typeof r.debtBillion==='number'?r.debtBillion:null):(typeof r.debtPct==='number'?r.debtPct:null)};})} lines={[{key:'debt',label:'Public-sector net debt',colour:'#175d65'}]} unit={unit==='bn'?'£bn':'% GDP'} xLabel="Month" sources={fiscal.sources} note="Official ONS net-debt stock and GDP ratio. The £bn switch shows the official stock amount."/></div><p className="small">Why the small wiggles? The rolling spending and receipts totals change each month, while their GDP denominator updates only quarterly. The quarterly steps create some of the sawtooth pattern; these are not all new policy changes.</p>
+ <Deficits bundle={bundle} compact/>
  <OverviewComposition bundle={bundle}/>
  <OverviewPricing bundle={bundle}/>
 

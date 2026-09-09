@@ -6,7 +6,7 @@ test('overview gives a concise orientation and direct analytical paths',async({p
  await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
  await expect(page.getByRole('heading',{name:'The fiscal position.',exact:true})).toBeVisible();
  for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
- await expect(page.locator('.overview .chart-panel')).toHaveCount(6);
+ await expect(page.locator('.overview .chart-panel')).toHaveCount(8);
  await expect(page.locator('.overview .metric')).toHaveCount(0);
  await expect(page.locator('.overview')).toContainText('Accounting contributions, not estimates of policy effects');
  await expect(page.locator('#overview-position-title')).toBeVisible();
@@ -106,4 +106,17 @@ test('overview composition sits before pricing and compares selected years on co
  const download=page.waitForEvent('download');await section.getByRole('button',{name:'CSV',exact:true}).first().click();await download;
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+});
+
+
+test('deficit decompositions reconcile and distinguish forecasts and structural coverage',async({page,request})=>{
+ const data=await(await request.get('data/outlook.json')).json();const v=data.vintages.find((x:{id:string})=>x.id==='2026-03'),r=v.rows[1];
+ await page.goto('./?page=fiscal&section=deficits&units=bn');await expect(page.getByRole('heading',{name:'Deficit decomposition.',exact:true})).toBeVisible();
+ await expect(page.locator('[aria-labelledby="deficit-primary-title"] .recharts-line-curve')).toBeVisible();
+ const table=page.getByRole('table',{name:'Deficit reconciliation',exact:true}),row=table.getByRole('row').filter({hasText:r.year});
+ await expect(row).toContainText((r.borrowingBn-r.interestBn).toFixed(2));await expect(row).toContainText((r.borrowingBn-r.structuralBorrowingBn).toFixed(2));await expect(row).toContainText('Forecast');
+ await page.getByRole('combobox',{name:'Deficit units',exact:true}).selectOption('gdp');await expect(row).toContainText(((r.borrowingBn-r.structuralBorrowingBn)/r.gdpBn*100).toFixed(2));
+ await page.getByRole('combobox',{name:'Deficit forecast vintage',exact:true}).selectOption('2025-11');await page.reload();await expect(page.getByRole('combobox',{name:'Deficit forecast vintage',exact:true})).toHaveValue('2025-11');
+ await expect(page.locator('#deficit-cycle-title').locator('..').locator('..').locator('..')).toContainText('reconstructed');
+ await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([]);
 });
