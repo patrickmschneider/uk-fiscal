@@ -4,11 +4,15 @@ Updated: 10 September 2026.
 
 ## Current state
 
-The Fiscal Space redesign is live at https://patrickmschneider.github.io/uk-fiscal/, implementing the complete TODO.md’s narrative structure and supported official-data analyses. Five top-level destinations replace the old dataset-led navigation; the previous fiscal, composition, debt and pricing tools remain available under Data. Local validation passed: production build, all seven data groups, 19 frontend tests, 68 Python tests, 18 retained Chromium/WebKit regressions and 12 production-path checks for the redesign. Independent data/automation and economic/design reviews found and resolved forecast-status, relief-aggregation and archive-recovery issues. The expanded seven-group refresh, production-path checks and Pages deployment all passed on GitHub. A final safeguard prevents a later forecast from being used to manufacture earlier monthly surprises.
+The concise-dashboard iteration is implemented and validated for publication through the existing GitHub Pages workflow. Navigation is Overview | Fiscal | Pricing | Debt & financing | Explore. Fiscal contains Position, Composition, Outlook and fiscal rules. The overview has three charts and a short dated explanation, replacing the repetitive ten-section briefing.
 
-New data include March 2026 OBR outlook, labelled November reconstruction, 36-year ONS history, formal fiscal-rule assessments and borrowing sensitivities; 577 HMRC relief records plus pension/ISA details; and a sourced curated event/calendar dataset. The new in-app Methodology view documents derived calculations and unsupported measures. See the implementation mapping at the end of PROJECT_PLAN.md.
+Composition retains snapshots, full comparable history with category highlights, and two-year contributions in %GDP, £bn or shares of the named total. Exact five-year PESA amounts remain separate from rounded long history. Contributions reconcile; unavailable requested years are identified; annual GDP conversions require an exact March denominator. Pricing is directly accessible, fiscal flows default to rolling-year %GDP with all history, axes have visible labels, and meaningful view selections persist in URLs.
 
-New boundaries: monthly component forecast profiles, matched current macro consensus, real-per-capita spending and a numerical matched debt snowball remain explicitly unavailable. OBR/HMRC publication discovery and calendar curation still require maintenance. No new economic quantities are substituted for these missing measures.
+Independent economic/product/design review found and resolved inconsistent unit-switch scope, lost detailed-composition access, incorrect links and denominator wording. Search and optional relief stories are separated. No extra review document was created. Desktop overview measured about 2,000px versus the previous 12,378px; its first chart starts within the first viewport. Mobile views were inspected in isolated browsers, with no user screen or microphone access.
+
+Validation for this iteration: production build, 22 frontend unit tests, 68 Python tests, all seven saved data groups, 18 Chromium/WebKit regression checks and 16 production-path checks passed. Browser checks cover mobile accessibility/overflow, exports, source failures, calendar comparisons, unit propagation, precise composition amounts and restored links/history.
+
+Sources and pipeline remain the same seven validated groups: ONS fiscal history, Treasury composition, DMO debt, BoE curves, OBR monthly profile and annual outlook, and HMRC reliefs. Existing forecast-status, relief-aggregation, source-failure and archive safeguards remain in place. Monthly component profiles, real-per-capita measures and automatic publication/calendar discovery remain outside this iteration.
 
 ## Milestones
 
@@ -33,7 +37,7 @@ Final checks: production build; 14 frontend unit tests; 43 Python adapter/pipeli
 - Compact normalized vintages and checksum metadata are preserved remotely on `data-history`; original workbooks remain local. The live `deployment.json` identifies the deployed code/data pair; archive `latest.json` can describe an attempted build.
 - Production build flags a large chart-library bundle; acceptable for this personal dashboard, revisit if hosted performance warrants it.
 
-Next: use the hosted app across devices, then close the DMO coverage/discovery gaps. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
+Next: owner review of the simpler dashboard across devices, then close the DMO coverage/discovery gaps. Do not add scenarios, policy tracking, embedding or elaborate design infrastructure yet.
 
 ## Owner refinements delivered, 9 September
 

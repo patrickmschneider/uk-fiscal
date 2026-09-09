@@ -311,33 +311,117 @@ Official source families above and the following platform/design references were
 
 Platform policies and dependencies can change. Keep the zero-recurring-cost constraint explicit and report a conflict rather than silently introducing a paid service.
 
-## The Fiscal Space redesign — 10 September 2026
+## Current plan: a concise overview and direct analytical tools
 
-The complete TODO.md supersedes the earlier navigation/extension priorities. Audit: the deployed app already has reconciled ONS accounts, PESA composition/history, DMO stock/calendar/auction views, BoE nominal/real/RPI pricing, exports, dated provenance and a retained-data refresh/archive workflow. Preserve those implementations. The major gaps are narrative hierarchy, annual OBR vintages/rules/macroeconomic assumptions, HMRC reliefs and a policy-monitoring layer.
+Execution status (10 September 2026): implemented and validated; publication uses the existing GitHub Pages workflow. Independent review findings were folded into the code and recorded in STATUS.md. The sections below retain the design intent and acceptance criteria; future source extensions remain deferred.
 
-| Existing component / source | Decision | Result |
+This plan supersedes the navigation and presentation requirements in TODO.md and the previous redesign mapping. The source definitions, safeguards and useful analytical capabilities remain. Implementation was authorised and completed in the subsequent execution turn.
+
+### Purpose and design decisions
+
+Serve two concrete tasks: onboard an economist who has not followed recent UK developments, and let an experienced user retrieve, compare and export a specific piece of evidence immediately. Organise the material around (1) the position and what changed, (2) the outlook and what supports it, and (3) financing costs and their transmission to the budget. Each detailed analysis has one home. The overview summarizes and provides direct links; it does not repeat the full analysis.
+
+The independent review inspected both the implementation and rendered desktop/mobile pages. Its economic findings—not merely a checklist of the owner's UI observations—drive this plan: the headline mixes different periods and concepts; accounting levels do not explain changes; formal headroom is not comprehensive fiscal capacity; current spot yields are not the cost of the whole debt stock. The owner additionally wants spending and tax composition retained alongside a clear view of how both have changed.
+
+### 1. Information architecture
+
+Primary navigation: **Overview | Fiscal | Pricing | Debt & financing | Explore**.
+
+| Destination | First thing shown | Deeper material |
 | --- | --- | --- |
-| App navigation, branding, headline layout | Replace | Briefing / Outlook / Fiscal Rules / Tax Reliefs / Data; editorial first viewport |
-| FiscalPage / ONS monthly accounts | Retain and move | Expert fiscal view in Data; reuse validated series in deterministic briefing |
-| BudgetHistory / PESA economic and functional history | Retain and move | Data composition view; coherent ranked summaries in Briefing |
-| DebtPage / DMO stock, financing and redemptions | Retain and move | Data financing view; debt-dynamics explanation links into it |
-| PricingPage / BoE curves, calendars and exports | Retain and move | Data pricing view; preserve date comparisons, real yields and RPI caveats |
-| ChartPanel / CSV, SVG, table and source controls | Modify | Consistent actual/forecast visual convention; reuse across narrative charts |
-| Monthly OBR borrowing profile | Retain and extend | Cumulative surprise with explicit sign and forecast-vintage caveat |
-| Refresh, validation, archival and Pages workflows | Extend | New official-source groups, change reports, compatible archive recovery |
-| Repeated headline cards and institution-led navigation | Remove from landing | Four primary measures and one economic story |
+| Overview | Concise position statement and the evidence below | Direct links to the exact relevant analysis |
+| Fiscal / Position | Receipts, spending and borrowing on a common period/basis | Monthly/YTD tracking, official profile surprise, accounting definitions |
+| Fiscal / Composition | Spending / Taxes & receipts selector; current composition and history immediately open | Two-year contribution comparison, classifications, detailed tables |
+| Fiscal / Outlook | Borrowing and debt paths, forecast boundary, vintage selector | Assumptions, stance, rules/headroom and official sensitivities |
+| Pricing | Existing nominal, real and RPI curves with date comparisons immediately usable | Basis-point changes and methodology; preserve all current tools |
+| Debt & financing | Debt stock, refinancing profile, issuance/redemptions and dates | Auctions, individual gilts, maturity/coupon definitions |
+| Explore | Search and category browsing | Named fiscal series, derived analyses, tax-relief lookup, sources and methodology |
 
-| New requirement | Required data | Proposed component | Complexity / sequence |
-| --- | --- | --- | --- |
-| 60-second summary and historical narrative | Existing ONS/PESA plus annual OBR forecast | Briefing / HistoryChart | Medium; phase 1 then 2 |
-| Primary balance / fiscal impulse / assumptions | Comparable OBR annual tables and definitions | Outlook / ForecastStance / Assumptions | High; phase 2, missing measures explicitly unavailable |
-| Rules, margins and successive forecasts | Official EFO rule definitions and vintage-specific assessment | Fiscal Rules / vintage selector | High; phase 2–3; distinguish spring forecast from formal rule assessment |
-| Profile tracking and surprise | Contemporaneous monthly official profiles | TrackRecord | Medium for borrowing; high for separate components, no synthetic monthly profiles |
-| Tax relief rankings, history and details | HMRC relief ODS, private pension statistics, ISA statistics | TaxReliefs with deep links and filters | High; phase 4; preserve suppression and separate pension definitions |
-| Beyond the Budget bridge | Explanatory text tied to HMRC dataset | Briefing bridge | Low; phase 4 |
-| Searchable series / coherent transformations | Existing series metadata, GDP, comparable official deflators where available | Data series explorer | Medium; levels/YoY/GDP/cumulative first, disable unsupported transforms |
-| Methodology destination | Explicit formulas and input/vintage definitions | Data notes | Medium; delivered alongside analytical charts |
-| Ledger / calendar / risks | Confirmed official announcements and release calendars | Monitor and structured datasets | Medium; phase 5, curated dates labelled and expired events filtered |
-| Revision/classification detection | Prior normalized snapshot versus incoming validated data | Refresh change report | Medium; integrate before publication |
+Keep fiscal subsections visible and directly bookmarkable. Provide a direct Composition link from Overview, alongside Pricing and Outlook. Preserve previous URLs as aliases, including pricing, debt, rules and relief detail links. Remove the generic Data introduction from specialist pages. A selected destination must show its content, not another closed disclosure.
 
-Implementation proceeds in the five phases in TODO.md. Research can run independently, but integrate and validate one layer at a time. Bounded independent economic/code review and responsive visual review replace extra review documents. Keep conditional requirements conditional: no invented macro sensitivities, monthly profiles, reform revenue, deflators, or numerical debt identities. Use the existing test suite for retained functionality, targeted numerical tests for new calculations, and headless browser checks for new navigation, mobile, exports and accessible controls. Publish only after the integrated checks pass.
+### 2. Overview: a short economic briefing
+
+The default experience should contain:
+
+1. **One position statement:** current rolling-12-month borrowing, its change versus the comparable previous period, and dated debt/GDP. No separate card row repeating these exact figures. Label the flow period and stock date explicitly.
+2. **Position evidence:** a receipts/spending chart on the same rolling-year basis, with the borrowing gap or a closely aligned borrowing panel. Default %GDP. Provide long-run context without overwhelming recent movements.
+3. **Outlook evidence:** compact borrowing and debt small multiples, sharing the financial-year horizon, with an unmistakable actual/forecast boundary. Do not place the two vastly different magnitudes on a misleading common scale. One takeaway distinguishes falling borrowing from stabilising debt.
+4. **What changed:** a short, data-derived description of the biggest spending/tax contribution changes, with a direct link to the composition comparison. Use complete financial years and state the comparison years; do not pretend annual composition is rolling-year data. Include one current borrowing-versus-profile statement when available.
+5. **Market orientation:** a compact dated market summary and prominent “Pricing / compare dates” link. Determine during the first layout check whether a small curve provides more information than a few carefully labelled benchmark yields; do not automatically add both. The full Pricing tool is always one primary-navigation click away.
+6. **Watch next:** the next relevant confirmed release, not a full news ledger. A brief outlook-rule note is allowed where it adds interpretation; no standalone headroom hero or generic risk grid.
+
+Aim for meaningful plotted evidence within the first desktop viewport and the position/takeaway before charts on mobile. Use roughly two desktop viewports as a design budget, not a rigid pixel target that forces unreadable plots. The onboarding test is whether the user can explain the position, change and outlook in a few minutes—not whether every dataset appears on the page.
+
+Remove the second full borrowing forecast chart, repeated stance/assumption/rule sections, full category rankings, generic risk paragraphs and long ledger from Overview. Specialist content remains accessible at its own destination.
+
+### 3. Spending and tax composition: keep levels, add changes
+
+Reuse BudgetHistory, annualBudgets, existing PESA history and the interest bridge. Do not create another parallel composition implementation.
+
+The dedicated Composition view should answer three linked questions:
+
+- **What is the budget made of?** Ranked current-year spending and tax/receipt breakdowns. Default %GDP; offer £bn and % of named total. Clearly identify the latest complete year.
+- **How has that composition evolved?** A long-run component history in the same units, with stable category colours and the aggregate visible. Start with all available comparable annual history; provide focus controls. Avoid a mass of indistinguishable lines: allow category selection/highlight and retain accessible values/tables.
+- **What explains the change between two years?** A ranked contribution chart/table. In %GDP mode, each contribution is category share in year B minus its share in year A, in **percentage points of GDP**. Include aggregate change and residual/rounding so the bridge reconciles. In £bn mode show amount differences; in named-total mode show percentage-point composition shifts, whose sum is zero apart from rounding.
+
+Initial comparison: 2019–20 versus the latest complete financial year, explicitly described as a pre-pandemic reference rather than a steady state. Provide previous-year and freely chosen year comparisons. Use the latest year genuinely shared by the selected dataset and denominator; never silently substitute another year.
+
+Preserve accounting boundaries:
+
+- Economic spending is the main reconciled TME bridge; functional PESA spending uses TES and shows its TME bridge separately.
+- Functional categories do not supply an independent pension/welfare/investment partition. Do not add overlapping categories or count debt interest twice.
+- Distinguish taxes/NICs from total receipts, including non-tax income. Keep existing source approximations such as combined income tax/CGT labelled.
+- Keep gross interest/dividends, net-interest proxies and OBR net interest explicitly distinct. A contribution is accounting attribution, not proof of a causal policy effect.
+- Label classification breaks and gaps; keep fixed mappings only where justified by the source.
+
+Overview should surface the largest relevant changes and link into this view with the selected years/units already set. It need not reproduce all rankings and histories.
+
+### 4. Scales, axes and historical windows
+
+Make %GDP the default for monetary fiscal aggregates, annual composition and relief costs. Provide one consistently placed **%GDP / £bn** control in fiscal analytical views, preserve it when moving between compatible views, and encode it in the URL. Composition may additionally offer % of named total. Show the chosen units on the chart and in exports; changing units must update the narrative, tables and comparisons together.
+
+Exceptions follow the economic question: yields/real rates/breakevens in %, curve changes in basis points, maturity in years, concentration in % of gilt principal, cover as a ratio, and counts as counts. Preserve nominal contractual issuance/redemption amounts where useful. Do not convert future headroom using today's GDP: retain official £bn unless a correctly matched forecast denominator is available. Monthly/YTD flows divided by annual GDP are not annualised; these modes are investigative options, not the onboarding default.
+
+Require ChartPanel to have an explicit meaningful X label and visible Y quantity/unit, also present in SVG exports. Audit custom rankings and maturity charts too. Use Financial year, Month, Maturity (years), or Category as appropriate; distinguish percent, percentage points and basis points. Keep outturn/forecast status visible without relying on colour alone; retain isolated observation markers.
+
+| Analysis | Existing coverage | Window decision |
+| --- | --- | --- |
+| Monthly fiscal flows | April 2000 onward | Rolling-year context with All / 10y / 5y controls; no five-point YTD default |
+| Annual borrowing/debt | 1990–91 onward | Keep long context, once per detailed analysis |
+| Composition | Economic/revenue from available complete years; 23 functional years; five detailed snapshot years | Full comparable history by default; disclose genuine snapshot limits |
+| Series explorer | Depends on selected monthly series | Derive first/last available dates; do not offer fictitious 1990 coverage |
+| OBR stance/assumptions | 2024–25 to 2030–31 in imported tables | Label as a forecast window; no invented historical structural series |
+| Monthly forecast tracking | Current fiscal-year official profile | Current-year cumulative is the correct default; no longer window for its own sake |
+| Yield curves | One year of saved observation dates, full maturity span | Keep maturity span and event-date comparisons; longer observation history is a separate data-backfill task |
+| Reliefs | Record-specific years and status | Full available comparable history, explicit gaps and forecast flags |
+
+This pass does not depend on new source acquisition. Do not turn every time series into the longest possible chart irrespective of its purpose.
+
+### 5. Expert access and reproducibility
+
+Open Composition directly. Lead relief lookup with search, year, classification and results; retain rankings and ISA/pension stories as optional investigation. Remove unrelated automatically appended charts from series search and expose them as explicit choices.
+
+Audit and persist meaningful view state in URLs: destination/subsection, series, units, transformation, date window, composition dataset and comparison years, forecast vintage, curve comparison dates, and relief selection/filters. Copied links, refresh and browser back/forward must restore the visible analysis. Reuse one small URL-state mechanism rather than separate implementations per page. Preserve existing export provenance and curve controls.
+
+### 6. Implementation sequence and proportionate review
+
+| Step | Work | Completion check |
+| --- | --- | --- |
+| 1 — Routes and removal | New navigation; one home per analysis; specialist wrappers removed; dedicated Composition open | Existing deep links still work; Pricing and Composition immediately reachable; no full duplicate overview charts |
+| 2 — Shared chart/state contracts | Units, axis labels, proper windows, URL persistence | Numerical denominator/difference tests; labelled screen/SVG axes; copy/reload/back restore a selected analysis |
+| 3 — Composition | Integrate snapshot, history and two-year changes using existing calculations | Spending and receipt bridges reconcile; unit toggles agree; classification/GDP gaps remain explicit |
+| 4 — Overview | Assemble the compact economic sequence from existing data | A newcomer can explain position/change/outlook without reading specialist essays; no duplicate headline prose/cards |
+| 5 — Independent check and publish | One bounded independent economic/editorial/UX review plus targeted regression | Resolve meaningful findings, run production-path checks, then publish through existing GitHub workflow |
+
+Use the existing components and pipelines; no new hosting, redesign framework or feature family. Keep the review outcome in STATUS rather than creating another document. Request an independent agent for the bounded final task review; the implementing agent owns integration and fixes.
+
+Task-based acceptance checks:
+
+1. A new team member identifies the current deficit, debt trajectory and main changes, while distinguishing actuals from forecasts and accounting from causal explanations.
+2. An expert opens a nominal/real/breakeven comparison directly, chooses dates and exports a labelled chart.
+3. A user sees current spending/tax composition, compares two years in %GDP and £bn, and can identify which categories account for the total change.
+4. A copied series/composition/forecast link restores exactly the selected analysis after reload and back/forward navigation.
+5. Mobile layouts retain readable axes and essential caveats; keyboard controls, tables and exports work.
+6. Old fiscal, pricing, financing and relief capabilities remain reachable; archived data, source failure protection and publication workflow remain intact.
+
+Deferred data work stays explicit: longer curve archives, component-level monthly OBR profiles, matched real/per-capita series and richer policy-costing feeds. None should delay this editorial and interaction repair.

@@ -1,6 +1,6 @@
 # The Fiscal Space
 
-Understanding the UK fiscal position, outlook and risks. A personal research tool for Patrick Schneider. Start with the narrative Briefing, then investigate Outlook, Fiscal Rules, Tax Reliefs and Data. The previous fiscal, composition, debt and pricing views remain under Data; charts retain source notes, tables, CSV and SVG exports.
+A personal UK fiscal research tool for Patrick Schneider. Start with a concise Overview, then open Fiscal (Position, Composition, Outlook and fiscal rules), Pricing, Debt & financing, or Explore. Fiscal amounts default to % GDP with a £bn option; composition also supports shares of its named total. Charts retain source notes, data tables and CSV/SVG exports. View links preserve analytical selections.
 
 ## Hosted app
 
@@ -38,12 +38,12 @@ The repository includes fitted Bank of England curve outputs for this non-commer
 
 ## Redesign coverage and maintenance
 
-- Briefing: deterministic four-measure snapshot; borrowing/debt history; deficit accounting; budget composition; stance; forecast; assumptions; profile surprise; rules; risks; sourced developments and upcoming releases.
-- Outlook: March 2026 EFO plus a **labelled rounded reconstruction** of November 2025 from the EFO change tables. Current ONS history is separate. New EFO publications require reviewing the pinned adapter and adding a vintage; they are not automatically discovered.
-- Fiscal Rules: November 2025 formal assessment, distinct March 2026 current-budget update, and published borrowing sensitivities. These are not headroom elasticities.
-- Tax Reliefs: January 2026 HMRC reliefs, July 2026 private pensions, September 2025 ISA statistics. Missing/withheld/negligible estimates stay missing. Component rows are excluded from aggregate views; structural and non-structural costs are never summed together. New publication mappings require maintenance.
-- Data: searchable ONS series and coherent level/YoY/GDP/cumulative/receipt-share transforms, existing expert views, and an in-app Methodology destination.
-- Monitoring: manually curated official events and release dates checked 10 September 2026; expired dates disappear from Upcoming. Update `public/data/monitor.json` when adding confirmed events. Viewing the app does not refresh official sources.
+- Overview: dated rolling-year borrowing and debt, long spending/receipts history, pre-pandemic composition changes, compact forecast paths and market pricing.
+- Fiscal: rolling/monthly/YTD position; composition snapshots, comparable history and reconciled two-year contributions; March 2026 EFO and a **labelled rounded reconstruction** of November 2025. Formal November rule assessments remain distinct from the March current-budget update. New EFO releases require adapter maintenance.
+- Pricing: nominal and real gilt spot curves, RPI breakevens and matched-date changes, with shared comparison calendars.
+- Debt & financing: gilt stock, maturity concentration, upcoming sales, redemptions and published auction results. Contractual amounts and auction statistics retain natural units.
+- Explore: searchable ONS series, HMRC relief records, selected analytical measures, source downloads and methodology. Relief search comes before optional stories; missing/withheld/negligible values stay missing, component rows are excluded from aggregates, and structural/non-structural costs are not combined.
+- Calendar: curated official events/releases checked 10 September 2026. Update `public/data/monitor.json` when confirmed events change. Viewing the app reads saved snapshots; it does not download official source workbooks.
 
 Separate monthly receipts, spending and interest forecast profiles are not available in the imported official profile. Real-per-capita spending lacks matched population data; a numerical debt snowball/effective rate lacks matched stock-flow definitions. Current consensus feeds, policy-versus-economy forecast decompositions and headroom stress elasticities are not fabricated. These limitations are shown beside the relevant analysis.
 

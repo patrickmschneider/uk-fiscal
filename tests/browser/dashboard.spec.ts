@@ -13,13 +13,14 @@ async function chooseDate(page:import('@playwright/test').Page,label:string,date
 
 test('fiscal briefing, period controls, URL state and exports',async({page},testInfo)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/?page=data&view=fiscal');
+  await page.goto('/?page=data&view=fiscal&period=ytd&units=bn');
   await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
   await expect(page.locator('.metric').first()).toContainText('£56.7bn');
   await expect(page.locator('.briefing')).toContainText('£2.3bn above');
   await page.getByRole('button',{name:'Latest month',exact:true}).click();
   await expect(page.locator('.metric').first()).toContainText('£1.8bn');
   await page.reload();await expect(page.getByRole('button',{name:'Latest month',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByText('Monthly borrowing against the OBR profile',{exact:true}).click();
   await page.getByRole('button',{name:'Show data table for Borrowing against the forecast',exact:true}).click();
   await expect(page.getByRole('table',{name:'Borrowing against the forecast',exact:true})).toContainText('56.70');
   const csvPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download Borrowing against the forecast CSV',exact:true}).click();const csv=await csvPromise;
@@ -40,7 +41,7 @@ test('debt windows, filtering, keyboard and mobile access',async({page},testInfo
   await page.getByText('Redemptions in the next 12 months',{exact:true}).click();await expect(page.getByRole('table',{name:'Upcoming gilt redemptions'})).toBeVisible();
   await page.getByText('Explore the gilt stock',{exact:true}).click();await page.getByLabel('Find a gilt').fill('GB00BNNGP668');await expect(page.getByRole('table',{name:'Gilts outstanding'}).locator('tbody tr')).toHaveCount(1);
   await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.getByRole('button',{name:'Fiscal position',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
+  await page.getByRole('button',{name:'Fiscal',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
   await page.getByRole('button',{name:'Debt & financing',exact:true}).click();
   const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
   await page.screenshot({path:testInfo.outputPath('debt-mobile.png'),fullPage:true});
@@ -76,7 +77,7 @@ test('fiscal GDP toggle changes flows, persists and exports denominators',async(
  const fiscal=await (await request.get('/data/fiscal.json')).json();const end=fiscal.asOf;
  const denominator=fiscal.gdp.observations.filter((r:{date:string})=>r.date<=end).at(-1);
  const borrowing=fiscal.observations.filter((r:{date:string})=>r.date>='2026-04').reduce((s:number,r:{borrowing:number})=>s+r.borrowing,0);
- await page.goto('/?page=data&view=fiscal');await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
+ await page.goto('/?page=data&view=fiscal&period=ytd');await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
  await expect(page.locator('.metric').first()).toContainText(`${(borrowing/denominator.rollingAnnualMillion*100).toFixed(2)}%`);
  await expect(page.locator('.briefing')).toContainText('pp above');
  await page.reload();await expect(page.getByRole('combobox',{name:'Flow units',exact:true})).toHaveValue('gdp');
@@ -120,27 +121,31 @@ test('failed curve reload preserves all last-good pricing curves',async({page})=
  for(const id of ['yield-curve','real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
 });
 
-test('annual budget histories reconcile and compare functional and revenue contributions',async({page,request})=>{
+test('annual composition changes reconcile, switch units and preserve comparisons',async({page,request},info)=>{
  const composition=await (await request.get('/data/composition.json')).json();
- await page.goto('/?page=data&view=fiscal');await page.getByText('Compare budgets over time',{exact:true}).click();
- await expect(page.getByRole('heading',{name:'Spending by economic category over time',exact:true})).toBeVisible();
- await expect(page.getByRole('table',{name:'Budget change contributions',exact:true})).toContainText('Net social benefits (including pensions)');
- await expect(page.getByRole('table',{name:'Interest and dividend bridge',exact:true})).toContainText('1.45');
- await expect(page.getByRole('table',{name:'Interest and dividend bridge',exact:true})).toContainText('2.87');
+ await page.goto('/?page=fiscal&section=composition&bhMode=change');
+ await expect(page.getByRole('table',{name:'Budget change contributions'})).toContainText('Net social benefits (including pensions)');
+ await page.getByText('Accounting boundaries and supporting measures',{exact:true}).click();
+ await expect(page.getByRole('table',{name:'Interest and dividend bridge'})).toContainText('1.45');
  await page.getByRole('combobox',{name:'Budget breakdown',exact:true}).selectOption('functional');
  await page.getByRole('combobox',{name:'Budget comparison start',exact:true}).selectOption('2019-20');
  await page.getByRole('combobox',{name:'Budget comparison end',exact:true}).selectOption('2025-26');
  const first=composition.history.years.find((y:{year:string})=>y.year==='2019-20'),last=composition.history.years.find((y:{year:string})=>y.year==='2025-26');
  const health=(y:{items:{name:string;pctGdp:number}[]})=>y.items.find(i=>i.name==='Health')!.pctGdp;
  const table=page.getByRole('table',{name:'Budget change contributions',exact:true});await expect(table.getByRole('row').filter({hasText:'Health'})).toContainText((health(last)-health(first)).toFixed(2));
- await expect(page.getByRole('table',{name:'TES to total spending bridge',exact:true})).toContainText('44.3');
- await page.getByRole('combobox',{name:'Budget comparison start',exact:true}).selectOption('2007-08');await expect(page.getByRole('heading',{name:'What changed between 2007-08 and 2025-26?',exact:true})).toBeVisible();
- await page.getByRole('combobox',{name:'Budget breakdown',exact:true}).selectOption('receipts');await expect(page.getByRole('heading',{name:'Revenue composition over time',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'Tax take versus total receipts',exact:true})).toBeVisible();
+ await page.getByRole('combobox',{name:'Budget history units',exact:true}).selectOption('bn');
+ const amount=(y:{items:{name:string;value:number}[]})=>y.items.find(i=>i.name==='Health')!.value;
+ await expect(table.getByRole('row').filter({hasText:'Health'})).toContainText(((amount(last)-amount(first))/1000).toFixed(2));
+ await page.reload();await expect(page.getByRole('combobox',{name:'Budget history units',exact:true})).toHaveValue('bn');
  await page.getByRole('combobox',{name:'Budget history units',exact:true}).selectOption('share');
+ await expect(table.getByRole('row').filter({hasText:'Health'})).toContainText((amount(last)/last.total*100-amount(first)/first.total*100).toFixed(2));
+ const csv=page.waitForEvent('download');await page.getByRole('button',{name:'Download comparison CSV',exact:true}).click();const file=info.outputPath('contributions.csv');await (await csv).saveAs(file);expect(await fs.readFile(file,'utf8')).toContain('percentage points of expenditure on services');
+ await page.getByRole('button',{name:'Over time',exact:true}).click();await expect(page.locator('#budget-history-title')).toBeVisible();
+ await expect(page.locator('[aria-labelledby="budget-history-title"] .recharts-label').filter({hasText:'Financial year'})).toBeVisible();
+ await page.getByRole('combobox',{name:'Budget breakdown',exact:true}).selectOption('receipts');await expect(page.getByRole('heading',{name:'Tax take versus total receipts',exact:true})).toBeVisible();
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+ expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([]);
 });
-
 
 test('RPI chart exposes its comparison calendar and updates the plotted comparison',async({page,request})=>{
  const data=await (await request.get('/data/curve.json')).json();const old=data.breakevenCurves[30];
@@ -153,21 +158,21 @@ test('RPI chart exposes its comparison calendar and updates the plotted comparis
  await expect(page).toHaveURL(new RegExp(`pricingCompare=${old.date}`));
 });
 
-test('state composition switches named-total and matched-year GDP denominators',async({page,request},testInfo)=>{
+test('detailed composition keeps precise amounts and matched-year GDP denominators',async({page,request},info)=>{
  const fiscal=await (await request.get('/data/fiscal.json')).json(),composition=await (await request.get('/data/composition.json')).json();
  const annual=composition.years.at(-1),health=annual.items.find((x:{name:string})=>x.name==='Health');
  const end=`${Number(annual.year.slice(0,4))+1}-03`,gdp=fiscal.gdp.observations.find((x:{date:string})=>x.date===end).rollingAnnualMillion;
- await page.goto('/?page=data&view=fiscal');await page.getByText('The composition of the state',{exact:true}).click();
- const spending=page.locator('.composition-block').filter({has:page.getByRole('heading',{name:'Spending by function',exact:true})});
- const healthRow=spending.locator('li').filter({hasText:'Health'});
- await expect(healthRow.locator('small')).toHaveText(`${(health.value/annual.total*100).toFixed(1)}%`);
- await page.getByRole('combobox',{name:'Composition units',exact:true}).selectOption('gdp');
- await expect(healthRow.locator('small')).toHaveText(`${(health.value/gdp*100).toFixed(1)}%`);
- const csvPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Download Spending by function CSV',exact:true}).click();const csv=await csvPromise;const file=testInfo.outputPath('composition-gdp.csv');await csv.saveAs(file);const text=await fs.readFile(file,'utf8');expect(text).toContain('Share of GDP (%)');expect(text).toContain(String(gdp));expect(text).toContain('ONS BKTL');
- await page.reload();await page.getByText('The composition of the state',{exact:true}).click();await expect(page.getByRole('combobox',{name:'Composition units',exact:true})).toHaveValue('gdp');
- const older=composition.years[0],olderGdp=fiscal.gdp.observations.find((x:{date:string})=>x.date===`${Number(older.year.slice(0,4))+1}-03`).rollingAnnualMillion;
- await page.getByRole('combobox',{name:'Composition year',exact:true}).selectOption(older.year);
- await expect(healthRow.locator('small')).toHaveText(`${(older.items.find((x:{name:string})=>x.name==='Health').value/olderGdp*100).toFixed(1)}%`);
+ await page.goto('/?page=fiscal&section=composition&bhDataset=detailed');
+ const healthRow=page.locator('.bar-list li').filter({hasText:'Health'});
+ await expect(healthRow).toContainText(`${(health.value/gdp*100).toFixed(2)} % of GDP`);
+ await page.getByRole('combobox',{name:'Budget history units',exact:true}).selectOption('share');
+ await expect(healthRow).toContainText((health.value/annual.total*100).toFixed(2));
+ await page.getByRole('combobox',{name:'Budget history units',exact:true}).selectOption('bn');
+ await expect(healthRow).toContainText((health.value/1000).toFixed(2));
+ const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download composition CSV',exact:true}).click();const file=info.outputPath('composition.csv');await(await pending).saveAs(file);expect(await fs.readFile(file,'utf8')).toContain('Health');
+ await page.reload();await expect(page.getByRole('combobox',{name:'Budget history units',exact:true})).toHaveValue('bn');
+ await page.getByRole('combobox',{name:'Composition financial year',exact:true}).selectOption(composition.years[0].year);
+ await expect(healthRow).toContainText((composition.years[0].items.find((x:{name:string})=>x.name==='Health').value/1000).toFixed(2));
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+ expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([]);
 });
