@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 test('overview gives a concise orientation and direct analytical paths',async({page},info)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('./');await expect(page).toHaveTitle('The Fiscal Space');
+ await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
  await expect(page.getByRole('heading',{name:'The fiscal position.',exact:true})).toBeVisible();
  for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
  await expect(page.locator('.overview .chart-panel')).toHaveCount(3);

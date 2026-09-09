@@ -1,4 +1,4 @@
-# The Fiscal Space
+# Fiscal Space
 
 A personal UK fiscal research tool for Patrick Schneider. Start with a concise Overview, then open Fiscal (Position, Composition, Outlook and fiscal rules), Pricing, Debt & financing, or Explore. Fiscal amounts default to % GDP with a £bn option; composition also supports shares of its named total. Charts retain source notes, data tables and CSV/SVG exports. View links preserve analytical selections.
 
