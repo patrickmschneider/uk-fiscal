@@ -93,3 +93,17 @@ test('shared units change headline and official forecast stocks and follow compo
  await page.goto('./?page=explore&view=series&units=bn');await page.getByRole('link',{name:'Budget composition',exact:true}).click();
  await expect(page).toHaveURL(/section=composition/);await expect(page.getByRole('combobox',{name:'Budget history units',exact:true})).toHaveValue('bn');
 });
+
+test('overview composition sits before pricing and compares selected years on consistent scales',async({page,request})=>{
+ const data=await(await request.get('data/composition.json')).json();const last=data.history.years.at(-1),first=data.history.years.find((y:{year:string})=>y.year==='2019-20');
+ const health=(y:{items:{name:string;pctGdp:number;value:number}[]})=>y.items.find(r=>r.name==='Health')!;
+ await page.goto('./');const section=page.locator('.overview-composition');await expect(section).toBeVisible();
+ const positions=await page.evaluate(()=>['.overview-position-pair','.overview-composition','.overview-market'].map(s=>document.querySelector(s)!.getBoundingClientRect().top));expect(positions[0]).toBeLessThan(positions[1]);expect(positions[1]).toBeLessThan(positions[2]);
+ const row=section.locator('li').filter({hasText:'Health'});await expect(row).toContainText(health(last).pctGdp.toFixed(2));
+ await section.getByRole('button',{name:'Change between years',exact:true}).click();await expect(section.getByRole('combobox',{name:'Compare from',exact:true})).toHaveValue('2019-20');await expect(row).toContainText((health(last).pctGdp-health(first).pctGdp).toFixed(2));
+ await section.getByRole('combobox',{name:'Composition units',exact:true}).selectOption('bn');await expect(row).toContainText(((health(last).value-health(first).value)/1000).toFixed(2));
+ await section.getByRole('combobox',{name:'Compare from',exact:true}).selectOption('2024-25');await page.reload();await expect(section.getByRole('combobox',{name:'Compare from',exact:true})).toHaveValue('2024-25');await expect(section.getByRole('combobox',{name:'Composition units',exact:true})).toHaveValue('bn');
+ const download=page.waitForEvent('download');await section.getByRole('button',{name:'CSV',exact:true}).first().click();await download;
+ await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
+});
