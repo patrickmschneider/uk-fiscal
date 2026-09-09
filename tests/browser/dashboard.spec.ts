@@ -13,7 +13,7 @@ async function chooseDate(page:import('@playwright/test').Page,label:string,date
 
 test('fiscal briefing, period controls, URL state and exports',async({page},testInfo)=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/?page=fiscal');
+  await page.goto('/?page=data&view=fiscal');
   await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
   await expect(page.locator('.metric').first()).toContainText('£56.7bn');
   await expect(page.locator('.briefing')).toContainText('£2.3bn above');
@@ -76,7 +76,7 @@ test('fiscal GDP toggle changes flows, persists and exports denominators',async(
  const fiscal=await (await request.get('/data/fiscal.json')).json();const end=fiscal.asOf;
  const denominator=fiscal.gdp.observations.filter((r:{date:string})=>r.date<=end).at(-1);
  const borrowing=fiscal.observations.filter((r:{date:string})=>r.date>='2026-04').reduce((s:number,r:{borrowing:number})=>s+r.borrowing,0);
- await page.goto('/?page=fiscal');await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
+ await page.goto('/?page=data&view=fiscal');await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
  await expect(page.locator('.metric').first()).toContainText(`${(borrowing/denominator.rollingAnnualMillion*100).toFixed(2)}%`);
  await expect(page.locator('.briefing')).toContainText('pp above');
  await page.reload();await expect(page.getByRole('combobox',{name:'Flow units',exact:true})).toHaveValue('gdp');
@@ -122,7 +122,7 @@ test('failed curve reload preserves all last-good pricing curves',async({page})=
 
 test('annual budget histories reconcile and compare functional and revenue contributions',async({page,request})=>{
  const composition=await (await request.get('/data/composition.json')).json();
- await page.goto('/?page=fiscal');await page.getByText('Compare budgets over time',{exact:true}).click();
+ await page.goto('/?page=data&view=fiscal');await page.getByText('Compare budgets over time',{exact:true}).click();
  await expect(page.getByRole('heading',{name:'Spending by economic category over time',exact:true})).toBeVisible();
  await expect(page.getByRole('table',{name:'Budget change contributions',exact:true})).toContainText('Net social benefits (including pensions)');
  await expect(page.getByRole('table',{name:'Interest and dividend bridge',exact:true})).toContainText('1.45');
@@ -157,7 +157,7 @@ test('state composition switches named-total and matched-year GDP denominators',
  const fiscal=await (await request.get('/data/fiscal.json')).json(),composition=await (await request.get('/data/composition.json')).json();
  const annual=composition.years.at(-1),health=annual.items.find((x:{name:string})=>x.name==='Health');
  const end=`${Number(annual.year.slice(0,4))+1}-03`,gdp=fiscal.gdp.observations.find((x:{date:string})=>x.date===end).rollingAnnualMillion;
- await page.goto('/?page=fiscal');await page.getByText('The composition of the state',{exact:true}).click();
+ await page.goto('/?page=data&view=fiscal');await page.getByText('The composition of the state',{exact:true}).click();
  const spending=page.locator('.composition-block').filter({has:page.getByRole('heading',{name:'Spending by function',exact:true})});
  const healthRow=spending.locator('li').filter({hasText:'Health'});
  await expect(healthRow.locator('small')).toHaveText(`${(health.value/annual.total*100).toFixed(1)}%`);

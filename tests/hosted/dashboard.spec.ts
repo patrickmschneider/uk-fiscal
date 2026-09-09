@@ -5,7 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 test('published app loads its data, navigation and charts beneath the project path',async({page,request},testInfo)=>{
  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
  const response=await request.get('data/fiscal.json');expect(response.ok()).toBe(true);const fiscal=await response.json();
- await page.goto('./?page=fiscal');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
+ await page.goto('./?page=data&view=fiscal');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
  await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
  await page.getByRole('button',{name:'Debt & financing',exact:true}).click();await expect(page.getByRole('heading',{name:'The stock. The cost. The calendar.'})).toBeVisible();
  await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page.getByRole('heading',{name:'Yields and inflation pricing.'})).toBeVisible();
@@ -21,7 +21,7 @@ test('published app loads its data, navigation and charts beneath the project pa
  expect(curve.breakevenCurves.length).toBeGreaterThan(0);expect(fiscal.observations.at(-1).date).toBe(fiscal.asOf);
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const accessibility=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(accessibility.violations).toEqual([]);
- await page.locator('.brand').click();await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
+ await page.locator('.brand').click();await expect(page.getByRole('heading',{name:'The UK’s fiscal position, explained.'})).toBeVisible();
  expect(errors).toEqual([]);
 });
 
@@ -29,7 +29,7 @@ test('a failed source refresh remains visible while saved data renders',async({p
  const manifest=await (await request.get('data/manifest.json')).json();
  manifest.groups.fiscal={...manifest.groups.fiscal,status:'failed',error:'Simulated source outage'};
  await page.route('**/data/manifest.json*',route=>route.fulfill({json:manifest}));
- await page.goto('./?page=fiscal');
+ await page.goto('./?page=data&view=fiscal');
  await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
  await expect(page.getByRole('status').filter({hasText:'Latest refresh could not update fiscal'})).toBeVisible();
  await expect(page.locator('.recharts-line-curve').first()).toBeVisible();

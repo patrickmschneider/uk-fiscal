@@ -1,6 +1,6 @@
-# UK Fiscal Dashboard
+# The Fiscal Space
 
-A personal UK fiscal briefing dashboard for Patrick Schneider. The app has three tabs: fiscal balances and breakdowns; debt, financing operations and redemptions; and Pricing for nominal/real yield curves and RPI breakeven inflation. Charts include source notes, tables, CSV and SVG downloads.
+Understanding the UK fiscal position, outlook and risks. A personal research tool for Patrick Schneider. Start with the narrative Briefing, then investigate Outlook, Fiscal Rules, Tax Reliefs and Data. The previous fiscal, composition, debt and pricing views remain under Data; charts retain source notes, tables, CSV and SVG exports.
 
 ## Hosted app
 
@@ -32,9 +32,22 @@ pip install -r requirements.txt
 python -m pipeline.refresh
 ```
 
-Use `--group fiscal`, `--group composition`, `--group debt`, `--group forecast` or `--group curve` for an individual source group. `--offline` replays locally archived downloads; `--validate` checks saved data. A failed group keeps its last good dataset, records the failure and returns a nonzero exit code. Downloads and release vintages are retained in ignored `data/archive/`; back up that directory if you need those vintages. Compact normalized vintages and input-checksum metadata are also preserved on the remote `data-history` branch. Raw source downloads remain local.
+Use `--group fiscal`, `--group composition`, `--group debt`, `--group forecast` `--group curve`, `--group outlook` or `--group reliefs` for an individual source group. `--offline` replays locally archived downloads; `--validate` checks saved data. A failed group keeps its last good dataset, records the failure and returns a nonzero exit code. Downloads and release vintages are retained in ignored `data/archive/`; back up that directory if you need those vintages. Compact normalized vintages and input-checksum metadata are also preserved on the remote `data-history` branch. Raw source downloads remain local.
 
 The repository includes fitted Bank of England curve outputs for this non-commercial academic dashboard, under the owner’s explicit decision to proceed with attribution despite unresolved reuse wording. This is not a claim of Open Government Licence coverage or specific Bank permission. The app and exports credit the Bank and its stated Bloomberg/Tradeweb inputs, distinguish dashboard calculations and disclaim endorsement. Original downloaded workbooks remain local. Run `python -m pipeline.refresh --group curve` to update the saved curves.
+
+## Redesign coverage and maintenance
+
+- Briefing: deterministic four-measure snapshot; borrowing/debt history; deficit accounting; budget composition; stance; forecast; assumptions; profile surprise; rules; risks; sourced developments and upcoming releases.
+- Outlook: March 2026 EFO plus a **labelled rounded reconstruction** of November 2025 from the EFO change tables. Current ONS history is separate. New EFO publications require reviewing the pinned adapter and adding a vintage; they are not automatically discovered.
+- Fiscal Rules: November 2025 formal assessment, distinct March 2026 current-budget update, and published borrowing sensitivities. These are not headroom elasticities.
+- Tax Reliefs: January 2026 HMRC reliefs, July 2026 private pensions, September 2025 ISA statistics. Missing/withheld/negligible estimates stay missing. Component rows are excluded from aggregate views; structural and non-structural costs are never summed together. New publication mappings require maintenance.
+- Data: searchable ONS series and coherent level/YoY/GDP/cumulative/receipt-share transforms, existing expert views, and an in-app Methodology destination.
+- Monitoring: manually curated official events and release dates checked 10 September 2026; expired dates disappear from Upcoming. Update `public/data/monitor.json` when adding confirmed events. Viewing the app does not refresh official sources.
+
+Separate monthly receipts, spending and interest forecast profiles are not available in the imported official profile. Real-per-capita spending lacks matched population data; a numerical debt snowball/effective rate lacks matched stock-flow definitions. Current consensus feeds, policy-versus-economy forecast decompositions and headroom stress elasticities are not fabricated. These limitations are shown beside the relevant analysis.
+
+Refresh metadata reports new/revised observations, source-section changes, forecast vintages and relief additions/deletions/reclassifications. Large historical revisions are flagged for review; a schema failure retains prior data. The durable archive preserves normalized data and input checksums; original source files remain in the local ignored archive.
 
 ## Current coverage
 
@@ -78,4 +91,4 @@ git clone --branch data-history --single-branch https://github.com/patrickmschne
 python -m pipeline.archive_history --destination /tmp/uk-fiscal-history --restore SNAPSHOT_ID --root /tmp/uk-fiscal-restore
 ```
 
-The command verifies all six datasets and reports `requiredCodeSha`. For a production rollback, recover that application commit in an isolated checkout, restore the matching snapshot (use `--code-sha` to enforce the match), and run the build and tests. Commit the recovered code/data to `main` while preserving the publishing workflow; the normal push deploys that pair without refreshing it first. Avoid force-pushing.
+The command verifies the complete dataset bundle and reports `requiredCodeSha`. For a production rollback, recover that application commit in an isolated checkout, restore the matching snapshot (use `--code-sha` to enforce the match), and run the build and tests. Commit the recovered code/data to `main` while preserving the publishing workflow; the normal push deploys that pair without refreshing it first. Avoid force-pushing.

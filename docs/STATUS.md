@@ -1,10 +1,14 @@
 # Project status
 
-Updated: 9 September 2026.
+Updated: 10 September 2026.
 
 ## Current state
 
-The three-tab MVP is live at https://patrickmschneider.github.io/uk-fiscal/ with real official data and downloadable charts/data. GitHub Pages serves it over HTTPS. Daily GitHub Actions refreshes and a durable `data-history` branch are configured; all five source groups have refreshed successfully from GitHub runners. See README for local use, manual refresh and rollback.
+The Fiscal Space redesign is implemented locally against the complete TODO.md. Five top-level destinations replace the old dataset-led navigation; the previous fiscal, composition, debt and pricing tools remain available under Data. Local validation passed: production build, all seven data groups, 18 frontend tests, 68 Python tests, 18 retained Chromium/WebKit regressions and 12 production-path checks for the redesign. Independent data/automation and economic/design reviews found and resolved forecast-status, relief-aggregation and archive-recovery issues. Pages publication is in progress.
+
+New data include March 2026 OBR outlook, labelled November reconstruction, 36-year ONS history, formal fiscal-rule assessments and borrowing sensitivities; 577 HMRC relief records plus pension/ISA details; and a sourced curated event/calendar dataset. The new in-app Methodology view documents derived calculations and unsupported measures. See the implementation mapping at the end of PROJECT_PLAN.md.
+
+New boundaries: monthly component forecast profiles, matched current macro consensus, real-per-capita spending and a numerical matched debt snowball remain explicitly unavailable. OBR/HMRC publication discovery and calendar curation still require maintenance. No new economic quantities are substituted for these missing measures.
 
 ## Milestones
 

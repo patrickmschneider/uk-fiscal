@@ -310,3 +310,34 @@ Official source families above and the following platform/design references were
 - [DMO glossary: cover and tail](https://dmo.gov.uk/help/glossary/)
 
 Platform policies and dependencies can change. Keep the zero-recurring-cost constraint explicit and report a conflict rather than silently introducing a paid service.
+
+## The Fiscal Space redesign — 10 September 2026
+
+The complete TODO.md supersedes the earlier navigation/extension priorities. Audit: the deployed app already has reconciled ONS accounts, PESA composition/history, DMO stock/calendar/auction views, BoE nominal/real/RPI pricing, exports, dated provenance and a retained-data refresh/archive workflow. Preserve those implementations. The major gaps are narrative hierarchy, annual OBR vintages/rules/macroeconomic assumptions, HMRC reliefs and a policy-monitoring layer.
+
+| Existing component / source | Decision | Result |
+| --- | --- | --- |
+| App navigation, branding, headline layout | Replace | Briefing / Outlook / Fiscal Rules / Tax Reliefs / Data; editorial first viewport |
+| FiscalPage / ONS monthly accounts | Retain and move | Expert fiscal view in Data; reuse validated series in deterministic briefing |
+| BudgetHistory / PESA economic and functional history | Retain and move | Data composition view; coherent ranked summaries in Briefing |
+| DebtPage / DMO stock, financing and redemptions | Retain and move | Data financing view; debt-dynamics explanation links into it |
+| PricingPage / BoE curves, calendars and exports | Retain and move | Data pricing view; preserve date comparisons, real yields and RPI caveats |
+| ChartPanel / CSV, SVG, table and source controls | Modify | Consistent actual/forecast visual convention; reuse across narrative charts |
+| Monthly OBR borrowing profile | Retain and extend | Cumulative surprise with explicit sign and forecast-vintage caveat |
+| Refresh, validation, archival and Pages workflows | Extend | New official-source groups, change reports, compatible archive recovery |
+| Repeated headline cards and institution-led navigation | Remove from landing | Four primary measures and one economic story |
+
+| New requirement | Required data | Proposed component | Complexity / sequence |
+| --- | --- | --- | --- |
+| 60-second summary and historical narrative | Existing ONS/PESA plus annual OBR forecast | Briefing / HistoryChart | Medium; phase 1 then 2 |
+| Primary balance / fiscal impulse / assumptions | Comparable OBR annual tables and definitions | Outlook / ForecastStance / Assumptions | High; phase 2, missing measures explicitly unavailable |
+| Rules, margins and successive forecasts | Official EFO rule definitions and vintage-specific assessment | Fiscal Rules / vintage selector | High; phase 2–3; distinguish spring forecast from formal rule assessment |
+| Profile tracking and surprise | Contemporaneous monthly official profiles | TrackRecord | Medium for borrowing; high for separate components, no synthetic monthly profiles |
+| Tax relief rankings, history and details | HMRC relief ODS, private pension statistics, ISA statistics | TaxReliefs with deep links and filters | High; phase 4; preserve suppression and separate pension definitions |
+| Beyond the Budget bridge | Explanatory text tied to HMRC dataset | Briefing bridge | Low; phase 4 |
+| Searchable series / coherent transformations | Existing series metadata, GDP, comparable official deflators where available | Data series explorer | Medium; levels/YoY/GDP/cumulative first, disable unsupported transforms |
+| Methodology destination | Explicit formulas and input/vintage definitions | Data notes | Medium; delivered alongside analytical charts |
+| Ledger / calendar / risks | Confirmed official announcements and release calendars | Monitor and structured datasets | Medium; phase 5, curated dates labelled and expired events filtered |
+| Revision/classification detection | Prior normalized snapshot versus incoming validated data | Refresh change report | Medium; integrate before publication |
+
+Implementation proceeds in the five phases in TODO.md. Research can run independently, but integrate and validate one layer at a time. Bounded independent economic/code review and responsive visual review replace extra review documents. Keep conditional requirements conditional: no invented macro sensitivities, monthly profiles, reform revenue, deflators, or numerical debt identities. Use the existing test suite for retained functionality, targeted numerical tests for new calculations, and headless browser checks for new navigation, mobile, exports and accessible controls. Publish only after the integrated checks pass.

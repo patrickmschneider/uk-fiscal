@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pipeline.archive_history import GROUPS, archive, digest, encode, restore
+from pipeline.archive_history import GROUPS, CORE_GROUPS, archive, digest, encode, restore
 
 
 class HistoryTests(unittest.TestCase):
@@ -33,7 +33,7 @@ class HistoryTests(unittest.TestCase):
         (self.root / 'public/data/fiscal.json').write_bytes(encode({'value': 2}))
         second = archive(self.destination, self.sha, root=self.root)
         self.assertNotEqual(first['snapshotId'], second['snapshotId'])
-        self.assertEqual(len(list((self.destination / 'releases').iterdir())), 7)
+        self.assertEqual(len(list((self.destination / 'releases').iterdir())), len(GROUPS)+2)
         for name, raw in original_objects.items():
             self.assertEqual((self.destination / 'releases' / name).read_bytes(), raw)
         self.assertEqual(json.loads((self.destination / 'latest.json').read_text())['snapshotId'], second['snapshotId'])
@@ -73,8 +73,17 @@ class HistoryTests(unittest.TestCase):
         stored = list((self.destination / 'metadata').glob('*.gz'))
         self.assertEqual(len(stored), 1)
         self.assertEqual(json.loads(gzip.decompress(stored[0].read_bytes())), metadata)
-        self.assertEqual(len(list((self.destination / 'releases').glob('*.gz'))), 7)
+        self.assertEqual(len(list((self.destination / 'releases').glob('*.gz'))), len(GROUPS)+2)
         self.assertFalse(any('private' in p.name for p in self.destination.rglob('*')))
+
+    def test_old_snapshot_removes_new_optional_datasets(self):
+        for name in set(GROUPS)-set(CORE_GROUPS):
+            (self.root/f'public/data/{name}.json').unlink()
+        snapshot=archive(self.destination,self.sha,root=self.root)
+        target=self.root/'old-restore';(target/'public/data').mkdir(parents=True)
+        (target/'public/data/reliefs.json').write_text('{}')
+        restore(self.destination,snapshot['snapshotId'],target,self.sha)
+        self.assertFalse((target/'public/data/reliefs.json').exists())
 
     def test_checksum_failure_does_not_replace_latest(self):
         archive(self.destination, self.sha, root=self.root)

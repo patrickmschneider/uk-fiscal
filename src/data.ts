@@ -13,7 +13,7 @@ export type CurveObservation = {date:string;points:{tenor:number;rate:number|nul
 export type Curve = {schemaVersion:number;status?:string;asOf?:string;observationDate?:string|null;sources:Source[];curves:CurveObservation[];realCurves?:CurveObservation[];breakevenCurves?:CurveObservation[];notes?:string[];reason?:string;basis?:string};
 export type GroupStatus = {status:string;lastChecked:string;lastSuccess?:string;error?:string;asOf?:string;releaseId?:string};
 export type Manifest = {schemaVersion:number;generatedAt:string;groups:Record<string,GroupStatus>};
-export type Bundle = {fiscal:Fiscal;composition:Composition;debt:Debt;forecast:Forecast;curve:Curve;manifest:Manifest|null;loadWarnings?:string[]};
+export type Bundle = {policy?:import('./policyData').PolicyBundle;fiscal:Fiscal;composition:Composition;debt:Debt;forecast:Forecast;curve:Curve;manifest:Manifest|null;loadWarnings?:string[]};
 
 export async function loadBundle(previous?:Bundle):Promise<Bundle> {
   const loadWarnings:string[]=[];
@@ -26,14 +26,17 @@ export async function loadBundle(previous?:Bundle):Promise<Bundle> {
       return value as T;
     } catch(error) {if(fallback!==undefined){loadWarnings.push(`${name}: ${error instanceof Error?error.message:String(error)}`);return fallback;}throw error;}
   }
-  const [fiscal,composition,debt,forecast,curve,manifest]=await Promise.all([
+  const [fiscal,composition,debt,forecast,curve,manifest,outlook,reliefs,monitor]=await Promise.all([
     read<Fiscal>('fiscal'),read<Composition>('composition'),read<Debt>('debt'),
     read<Forecast>('forecast',previous?.forecast||{schemaVersion:1,status:'unavailable',sources:[],notes:['Forecast data could not be loaded.']}),
     read<Curve>('curve',previous?.curve||{schemaVersion:1,status:'unavailable',sources:[],curves:[],notes:['The official yield-curve download is not yet available in this snapshot.']}),
     read<Manifest|null>('manifest',previous?.manifest||null),
+    read<import('./policyData').Outlook|null>('outlook',previous?.policy?.outlook||null),
+    read<import('./policyData').Reliefs|null>('reliefs',previous?.policy?.reliefs||null),
+    read<import('./policyData').Monitor|null>('monitor',previous?.policy?.monitor||null),
   ]);
   if(!fiscal.observations?.length || !composition.years?.length || !debt.securities?.length) throw new Error('The saved data are incomplete. Run the documented data refresh.');
-  return {fiscal,composition,debt,forecast,curve,manifest,loadWarnings};
+  return {fiscal,composition,debt,forecast,curve,manifest,loadWarnings,policy:{outlook,reliefs,monitor}};
 }
 
 export type Mode='ytd'|'month'|'rolling';
@@ -55,7 +58,7 @@ export function dateLabel(value:string,short=false):string {const match=/^\d{4}-
 export function csvText(headers:string[],rows:(string|number|null|undefined)[][]):string {const quote=(v:unknown)=>{let s=v==null?'':String(v);if(typeof v==='string'&&/^[=+@\-\t\r]/.test(s))s="'"+s;return `"${s.replaceAll('"','""')}"`;};return [headers,...rows].map(r=>r.map(quote).join(',')).join('\r\n');}
 export function downloadCsv(name:string,headers:string[],rows:(string|number|null|undefined)[][],metadata:string):void {
   const text=csvText([...headers,'Source / definitions'],rows.map(r=>[...r,metadata]));
-  const url=URL.createObjectURL(new Blob(['\ufeff'+text],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`uk-fiscal-${name}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const url=URL.createObjectURL(new Blob(['\ufeff'+text],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`the-fiscal-space-${name}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 export function isOverdue(group:string,asOf:string,now=new Date()):boolean {
   if(!asOf)return true;

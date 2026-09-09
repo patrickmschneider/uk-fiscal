@@ -13,7 +13,8 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-GROUPS = ('fiscal', 'composition', 'forecast', 'debt', 'curve')
+CORE_GROUPS = ('fiscal', 'composition', 'forecast', 'debt', 'curve')
+GROUPS = (*CORE_GROUPS, 'outlook', 'reliefs', 'monitor')
 RELEASE = re.compile(r'(' + '|'.join(GROUPS) + r')-([a-f0-9]{64})\.json$')
 
 
@@ -81,6 +82,8 @@ def archive(destination, code_sha, migrate_local=False, root=ROOT):
     # An explicit allowlist avoids publishing future private files in this directory.
     for name in (*GROUPS, 'manifest'):
         source = root / f'public/data/{name}.json'
+        if name not in (*CORE_GROUPS, 'manifest') and not source.exists():
+            continue
         raw = source.read_bytes()
         files[f'{name}.json'] = compressed_object(destination, 'releases',
                                                    f'{name}-{digest(raw)}', raw)
@@ -109,8 +112,9 @@ def restore(destination, snapshot_id, root=ROOT, code_sha=None):
         raise ValueError('Unsupported deployment record schema')
     if code_sha is not None and code_sha != record['codeSha']:
         raise ValueError(f"Snapshot requires code SHA {record['codeSha']}")
-    expected = {f'{name}.json' for name in (*GROUPS, 'manifest')}
-    if set(record['files']) != expected:
+    expected = {f'{name}.json' for name in (*CORE_GROUPS, 'manifest')}
+    allowed = {f'{name}.json' for name in (*GROUPS, 'manifest')}
+    if not expected.issubset(record['files']) or not set(record['files']).issubset(allowed):
         raise ValueError('Snapshot does not contain the expected dashboard bundle')
     pending = {}
     for name, ref in record['files'].items():
@@ -125,6 +129,8 @@ def restore(destination, snapshot_id, root=ROOT, code_sha=None):
     # Validate the whole bundle before replacing any file.
     for name, payload in pending.items():
         atomic(root / 'public/data' / name, payload)
+    for name in allowed - set(record['files']):
+        (root / 'public/data' / name).unlink(missing_ok=True)
     return {'snapshotId': snapshot_id, 'requiredCodeSha': record['codeSha'],
             'restoredFiles': len(pending)}
 

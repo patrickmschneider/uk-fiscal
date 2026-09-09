@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 import requests
 
 ROOT=Path(__file__).resolve().parents[1]
-GROUPS=('fiscal','composition','forecast','debt','curve')
+GROUPS=('fiscal','composition','forecast','debt','curve','outlook','reliefs')
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -67,16 +67,22 @@ def validate(group,data):
         if abs(sum(s['nominalMillion'] for s in data['securities'])-data['totals']['nominalMillion'])>.001:raise ValueError('Debt total mismatch')
     elif group=='forecast':
         if data.get('status')!='available' or len(data.get('cumulative',[]))!=12:raise ValueError('Incomplete forecast')
+    elif group=='outlook':
+        from .outlook import validate_outlook
+        validate_outlook(data)
+    elif group=='reliefs':
+        from .reliefs import validate_reliefs
+        validate_reliefs(data)
     elif group=='curve':
         if not data.get('curves'):raise ValueError('No validated curve observations')
 
-def promote(group,data,fetcher,root=ROOT):
+def promote(group,data,fetcher,root=ROOT,changes=None):
     validate(group,data)
     # Retrieved times belong in a release record, not a claim that old observations are new.
     raw=encode(data);release=digest(raw)
     archive=Path(root)/'data/archive/releases'
     atomic(archive/f'{group}-{release}.json',raw)
-    atomic(archive/f'{group}-{release}.metadata.json',encode({'group':group,'releaseId':release,'createdAt':stamp(),'inputs':fetcher.records}))
+    atomic(archive/f'{group}-{release}.metadata.json',encode({'group':group,'releaseId':release,'createdAt':stamp(),'inputs':fetcher.records,'changes':changes}))
     atomic(Path(root)/f'public/data/{group}.json',raw)
     return release
 
@@ -89,15 +95,20 @@ def refresh(groups=GROUPS,offline=False,root=ROOT,adapters=None):
         from .dmo import fetch_debt
         from .obr import fetch_forecast
         from .boe import fetch_curve
-        adapters=dict(zip(GROUPS,[fetch_fiscal,fetch_composition,fetch_forecast,fetch_debt,fetch_curve]))
+        from .outlook import fetch_outlook
+        from .reliefs import fetch_reliefs
+        adapters=dict(zip(GROUPS,[fetch_fiscal,fetch_composition,fetch_forecast,fetch_debt,fetch_curve,fetch_outlook,fetch_reliefs]))
     failed=[]
     for group in groups:
         previous=manifest['groups'].get(group,{})
         fetcher=Fetcher(root,offline)
         try:
             data=adapters[group](fetcher)
-            release=promote(group,data,fetcher,root)
-            manifest['groups'][group]={'status':'success','outcome':'unchanged' if previous.get('releaseId')==release else 'new','lastChecked':stamp(),'lastSuccess':stamp(),'asOf':data.get('asOf') or data.get('observationDate') or data.get('publicationDate'),'releaseId':release,'mode':'archive replay' if offline else 'source download'}
+            from .changes import compare_release
+            saved=root/f'public/data/{group}.json'
+            changes=compare_release(group,json.loads(saved.read_text()) if saved.exists() else None,data)
+            release=promote(group,data,fetcher,root,changes=changes)
+            manifest['groups'][group]={'status':'success','outcome':'unchanged' if previous.get('releaseId')==release else 'new','lastChecked':stamp(),'lastSuccess':stamp(),'asOf':data.get('asOf') or data.get('observationDate') or data.get('publicationDate'),'releaseId':release,'mode':'archive replay' if offline else 'source download','changes':changes}
             print(f'{group}: validated and saved',flush=True)
         except Exception as exc:
             manifest['groups'][group]={**previous,'status':'failed','lastChecked':stamp(),'error':str(exc)}
