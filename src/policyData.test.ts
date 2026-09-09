@@ -1,6 +1,7 @@
 import {describe,it,expect} from 'vitest';
-import {impulse,forecastBridge,reliefValue,borrowingSurprise,type OutlookRow} from './policyData';
+import {impulse,forecastBridge,reliefValue,borrowingSurprise,canCompareProfilePeriod,type OutlookRow} from './policyData';
 describe('transparent fiscal calculations',()=>{
+ it('a later forecast cannot create historical surprises',()=>{expect(canCompareProfilePeriod('2026-07','November 2026')).toBe(false);expect(canCompareProfilePeriod('2026-11','November 2026')).toBe(false);expect(canCompareProfilePeriod('2026-07','March 2026')).toBe(true);expect(canCompareProfilePeriod('2026-07',undefined)).toBe(false);});
  it('an improving structural primary surplus is contractionary',()=>{expect(impulse(2,1)).toBe(-1);expect(impulse(-2,-1)).toBe(1);expect(impulse(null,1)).toBeNull();});
  it('missing or withheld reliefs and unavailable GDP never become zero',()=>{expect(reliefValue({year:'2024-25',costMillion:null,status:'withheld',claimants:null},'bn',1000)).toBeNull();expect(reliefValue({year:'2024-25',costMillion:5,status:'estimate',claimants:null},'gdp',null)).toBeNull();});
  it('borrowing surprise is actual minus profile',()=>{expect(borrowingSurprise(60,55)).toBe(5);expect(borrowingSurprise(null,55)).toBeNull();});
