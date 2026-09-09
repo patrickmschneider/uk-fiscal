@@ -19,3 +19,13 @@ export function reliefValue(estimate:ReliefEstimate|undefined,units:string,gdpMi
 
 export function profileOriginMonth(vintage:string|undefined):string|null {const months=['January','February','March','April','May','June','July','August','September','October','November','December'];const match=vintage?.match(/(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})/);return match?`${match[2]}-${String(months.indexOf(match[1])+1).padStart(2,'0')}`:null;}
 export function canCompareProfilePeriod(period:string,vintage:string|undefined){const origin=profileOriginMonth(vintage);return origin!==null&&period>origin;}
+
+/** Keep the selected forecast vintage's final outturn as its explicit baseline. */
+export function forecastHistoryRows(history:OutlookRow[],vintage:Vintage,key:string){
+ const start=Number(vintage.forecastStart.slice(0,4))-10;
+ const values=new Map(history.filter(r=>Number(r.year.slice(0,4))>=start&&r.year<vintage.forecastStart).map(r=>[r.year,r]));
+ for(const row of vintage.rows)values.set(row.year,row);
+ const ordered=[...values.values()].sort((a,b)=>a.year.localeCompare(b.year));
+ const baseline=ordered.filter(r=>r.year<vintage.forecastStart&&typeof r[key]==='number').at(-1)?.year;
+ return ordered.map(r=>({label:r.year,actual:r.year<vintage.forecastStart&&typeof r[key]==='number'?r[key] as number:null,forecast:(r.year>=vintage.forecastStart||r.year===baseline)&&typeof r[key]==='number'?r[key] as number:null}));
+}

@@ -6,10 +6,11 @@ test('overview gives a concise orientation and direct analytical paths',async({p
  await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
  await expect(page.getByRole('heading',{name:'The fiscal position.',exact:true})).toBeVisible();
  for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
- await expect(page.locator('.overview .chart-panel')).toHaveCount(3);
+ await expect(page.locator('.overview .chart-panel')).toHaveCount(6);
  await expect(page.locator('.overview .metric')).toHaveCount(0);
  await expect(page.locator('.overview')).toContainText('Accounting contributions, not estimates of policy effects');
  await expect(page.locator('#overview-position-title')).toBeVisible();
+ for(const id of ['overview-debt','overview-yields','overview-breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
  expect(await page.locator('#overview-position-title').evaluate(e=>e.getBoundingClientRect().top)).toBeLessThan(900);
  await expect(page.getByRole('link',{name:'Spending & tax composition →',exact:true})).toHaveAttribute('href',/page=fiscal&section=composition/);
  await expect(page.getByRole('link',{name:'Compare yield curves →',exact:true})).toHaveAttribute('href','?page=pricing&units=gdp');
