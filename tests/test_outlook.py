@@ -41,6 +41,24 @@ class OutlookTests(unittest.TestCase):
         self.assertEqual(current['rows'][1]['outputGapPct'],-.8)
         self.assertEqual(current['rows'][2]['gdpDeflatorGrowth'],2.0)
 
+    def test_historical_primary_interest_includes_all_obr_components(self):
+        import csv, io
+        codes=['KX5Q','JW2O','JW2P','JW2L','HF6X','HF6W','DZLW','JW2M']
+        buf=io.StringIO();writer=csv.writer(buf)
+        writer.writerows([['Title']+codes,['CDID']+codes,['Release Date']+['21-08-2026']*len(codes)])
+        gdp=io.StringIO();gw=csv.writer(gdp)
+        for year in range(1990,2026):
+            for quarter in range(1,5):
+                period=f'{year} Q{quarter}'
+                writer.writerow([period,100000,80000,10000,3000,90,2000,5000,1000])
+                gw.writerow([period,500000])
+        history,_=outlook.parse_history(buf.getvalue().encode(),gdp.getvalue().encode())
+        row=history[0]
+        self.assertEqual(row['interestBn'],28) # Old proxy remains separate.
+        self.assertEqual(row['deficitInterestBn'],32) # 4*(10-3+1).
+        self.assertEqual(row['borrowingBn']-row['deficitInterestBn'],48)
+        self.assertEqual(row['gdpBn'],2000)
+
     def test_reconstructed_vintage_keeps_previous_assumptions(self):
         prior=self.parsed()[0]
         self.assertTrue(prior['reconstructed'])

@@ -122,7 +122,9 @@ test('deficit decompositions reconcile and distinguish forecasts and structural 
  await page.getByRole('combobox',{name:'Deficit display',exact:true}).selectOption('components');
  await expect(chart.locator('.recharts-bar')).toHaveCount(2);
  await page.getByRole('combobox',{name:'History',exact:true}).selectOption('all');
- await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText('total only');
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText('structural unavailable');
+ const historical=data.history.find((x:{year:string})=>x.year==='1990-91');
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText((historical.borrowingBn-historical.deficitInterestBn).toFixed(2));
  const table=page.getByRole('table',{name:'Deficit reconciliation',exact:true}),row=table.getByRole('row').filter({hasText:r.year});
  await expect(row).toContainText((r.borrowingBn-r.interestBn).toFixed(2));await expect(row).toContainText((r.borrowingBn-r.structuralBorrowingBn).toFixed(2));await expect(row).toContainText('Forecast');
  await page.getByRole('combobox',{name:'Deficit units',exact:true}).selectOption('gdp');await expect(row).toContainText(((r.borrowingBn-r.structuralBorrowingBn)/r.gdpBn*100).toFixed(2));

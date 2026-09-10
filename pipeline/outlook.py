@@ -95,7 +95,7 @@ def parse_efo(raw):
 def parse_history(pusf,gdp):
     rows=list(csv.reader(io.StringIO(pusf.decode('utf-8-sig')))); indices={v:i for i,v in enumerate(rows[1])}
     if rows[0][0]!='Title' or rows[1][0]!='CDID':raise ValueError('Expected ONS PUSF metadata')
-    required=['KX5Q','JW2O','JW2P','JW2L','HF6X','HF6W','DZLW']
+    required=['KX5Q','JW2O','JW2P','JW2L','HF6X','HF6W','DZLW','JW2M']
     if any(k not in indices for k in required):raise ValueError('Missing ONS history series')
     series={r[0]:r for r in rows if re.fullmatch(r'\d{4} Q[1-4]',r[0])}
     gdprows=list(csv.reader(io.StringIO(gdp.decode('utf-8-sig'))));gdpseries={r[0]:float(r[1]) for r in gdprows if re.fullmatch(r'\d{4} Q[1-4]',r[0]) and r[1]}
@@ -111,11 +111,16 @@ def parse_history(pusf,gdp):
         if receipts is None or spending is None:continue
         g=sum(gdpseries[p]for p in periods)/1000
         net=total('JW2P');income=total('JW2L');interest=net-income if net is not None and income is not None else None
+        # OBR Working Paper 17, table A.1: primary deficit is
+        # -J5II - (JW2P - JW2L + JW2M). Retain the existing financing
+        # proxy separately because other views already use it.
+        internal_interest=total('JW2M')
+        deficit_interest=interest+internal_interest if interest is not None and internal_interest is not None else None
         borrowing=round(spending-receipts,6)
         end=series[periods[-1]]
         def endval(code):
             v=end[indices[code]];return float(v)if v not in ('','..','...')else None
-        result.append({'year':f'{y}-{str(y+1)[2:]}','status':'outturn','borrowingBn':borrowing,'borrowingPct':round(100*borrowing/g,6),'receiptsBn':receipts,'spendingBn':spending,'receiptsPct':100*receipts/g,'spendingPct':100*spending/g,'interestBn':interest,'interestPct':100*interest/g if interest is not None else None,'primaryBalancePct':100*(interest-borrowing)/g if interest is not None else None,'structuralPrimaryBalancePct':None,'debtPct':endval('HF6X'),'debtBn':endval('HF6W'),'gdpBn':g,'netInvestmentBn':total('DZLW')})
+        result.append({'year':f'{y}-{str(y+1)[2:]}','status':'outturn','borrowingBn':borrowing,'borrowingPct':round(100*borrowing/g,6),'receiptsBn':receipts,'spendingBn':spending,'receiptsPct':100*receipts/g,'spendingPct':100*spending/g,'deficitInterestBn':deficit_interest,'interestBn':interest,'interestPct':100*interest/g if interest is not None else None,'primaryBalancePct':100*(deficit_interest-borrowing)/g if deficit_interest is not None else None,'structuralPrimaryBalancePct':None,'debtPct':endval('HF6X'),'debtBn':endval('HF6W'),'gdpBn':g,'netInvestmentBn':total('DZLW')})
     if len(result)<30:raise ValueError('Insufficient ONS annual fiscal history')
     return result,datetime.strptime(release,'%d-%m-%Y').date().isoformat()
 
@@ -132,8 +137,8 @@ def fetch_outlook(fetch):
       'currentBudgetUpdate':{'year':'2029-30','surplusBn':-next(r['currentBudgetDeficitBn'] for r in vintages[-1]['rows'] if r['year']=='2029-30'),'publicationDate':'2026-03-03','formalAssessment':False,'sourceUrl':EFO_URL,'note':'The March 2026 EFO does not formally assess compliance with the fiscal rules. £23.6bn is the updated current-budget surplus forecast, not a new formal rule assessment.'},
       'headroomHistory':[{'vintage':'2025-03','label':'March 2025','publicationDate':'2025-03-26','headroomBn':9.9,'targetYear':'2029-30','sourceUrl':NOV_PAGE},{'vintage':'2025-11','label':'November 2025','publicationDate':'2025-11-26','headroomBn':21.7,'targetYear':'2029-30','sourceUrl':BUDGET_URL}],
       'sensitivities':[{'id':'rates','label':'Bank Rate and gilt yields +1pp','shock':1,'unit':'percentage points','borrowingChangeBn':15,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Sustained rise from 2026-27. Official borrowing sensitivity, not an elasticity of headroom.'},{'id':'nominal-growth','label':'Nominal GDP growth −0.1pp each year','shock':-0.1,'unit':'percentage points per year','borrowingChangeBn':8,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Official isolated ready-reckoner shock from 2026-27.'},{'id':'rpi','label':'RPI inflation +1pp','shock':1,'unit':'percentage points','borrowingChangeBn':11,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Sustained rise from 2026-27. Downward 1pp shock reduces borrowing £10bn; asymmetry is official.'}],
-      'sources':[{'name':'OBR March 2026 EFO, Annex A tables A.3–A.10','url':EFO_URL,'publicationDate':'2026-03-03'},{'name':'ONS PUSF','url':ONS_URL,'publicationDate':release},{'name':'ONS GDP BKTL','url':GDP_URL},{'name':'Charter for Budget Responsibility Autumn 2025','url':CHARTER_URL},{'name':'Budget 2025 fiscal-rule assessment','url':BUDGET_URL}],
-      'notes':['Pinned EFO vintage; new publications require adapter review and are added, never substituted for older forecasts.','History is the latest ONS vintage, separate from OBR vintage rows. Borrowing history = TME minus current receipts; flow ratios divide by the sum of April–March nominal GDP quarters. Debt is the published end-March debt/GDP ratio.','Historical net interest uses interest and dividends paid outside the public sector minus those received (JW2P−JW2L); it is a net-financing-cost proxy, not necessarily identical to the OBR net-interest definition.','Missing cyclical estimates remain null. No pre-2024 structural-primary history has been inferred.','Forecast assumptions use fiscal years. No current macro outturn or consensus feed is yet attached to these annual assumptions.']}
+      'sources':[{'name':'OBR March 2026 EFO, Annex A tables A.3–A.10','url':EFO_URL,'publicationDate':'2026-03-03'},{'name':'OBR primary-deficit methodology, Working Paper 17 table A.1','url':'https://obr.uk/docs/dlm_uploads/working_paper_no17_uncertainty.pdf'},{'name':'ONS PUSF','url':ONS_URL,'publicationDate':release},{'name':'ONS GDP BKTL','url':GDP_URL},{'name':'Charter for Budget Responsibility Autumn 2025','url':CHARTER_URL},{'name':'Budget 2025 fiscal-rule assessment','url':BUDGET_URL}],
+      'notes':['Pinned EFO vintage; new publications require adapter review and are added, never substituted for older forecasts.','History is the latest ONS vintage, separate from OBR vintage rows. Borrowing history = TME minus current receipts; flow ratios divide by the sum of April–March nominal GDP quarters. Debt is the published end-March debt/GDP ratio.','Historical net interest uses interest and dividends paid outside the public sector minus those received (JW2P−JW2L); it is a net-financing-cost proxy, not necessarily identical to the OBR net-interest definition.','Historical primary deficit = borrowing minus (JW2P−JW2L+JW2M), following OBR Working Paper 17 table A.1. Annual non-seasonally-adjusted totals use matched financial-year GDP. Missing cyclical estimates remain null.','Forecast assumptions use fiscal years. No current macro outturn or consensus feed is yet attached to these annual assumptions.']}
 
     for i,source in enumerate(data['sources']):
         source['id']=f'outlook-source-{i}'
@@ -170,6 +175,10 @@ def validate_outlook(data):
     if len(hist)<30 or len({r['year']for r in hist})!=len(hist):raise ValueError('History coverage incomplete or duplicated')
     for row in hist:
         if row.get('status')!='outturn':raise ValueError('Historical ONS row misclassified')
+        if row.get('deficitInterestBn') is not None:
+            if not math.isfinite(row['deficitInterestBn']):raise ValueError('Invalid historical net interest')
+            if abs((row['deficitInterestBn']-row['borrowingBn'])/row['gdpBn']*100-row['primaryBalancePct'])>.00001:
+                raise ValueError('Historical primary balance identity failed')
         if abs(row['spendingBn']-row['receiptsBn']-row['borrowingBn'])>.002:raise ValueError('History borrowing identity failed')
     update=data['currentBudgetUpdate']
     latest=next(v for v in vintages if v['id']==data['latestVintage'])

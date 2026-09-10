@@ -12,10 +12,10 @@ it('does not manufacture structural estimates or GDP denominators',()=>{
 });
 
 it('extends totals without inventing comparable components or overwriting vintage rows',()=>{
- const historic=[{year:'1999-00',borrowingBn:1},{year:'2000-01',borrowingBn:10,interestBn:3,structuralBorrowingBn:4},{year:'2024-25',borrowingBn:999}] as OutlookRow[];
+ const historic=[{year:'1999-00',borrowingBn:1},{year:'2000-01',borrowingBn:10,interestBn:3,deficitInterestBn:5,structuralBorrowingBn:4},{year:'2024-25',borrowingBn:999}] as unknown as OutlookRow[];
  const vintage=[{year:'2024-25',borrowingBn:20,interestBn:8}] as OutlookRow[];
  const result=deficitHistoryRows(historic,vintage,'2000');
  expect(result.map(r=>r.year)).toEqual(['2000-01','2024-25']);
- expect(result[0].borrowingBn).toBe(10);expect(result[0].interestBn).toBeNull();expect(result[0].structuralBorrowingBn).toBeNull();
+ expect(result[0].borrowingBn).toBe(10);expect(result[0].interestBn).toBe(5);expect(result[0].structuralBorrowingBn).toBeNull();
  expect(result[1].borrowingBn).toBe(20);expect(result[1].interestBn).toBe(8);
 });
