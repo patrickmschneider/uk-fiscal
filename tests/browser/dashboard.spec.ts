@@ -41,7 +41,7 @@ test('debt windows, filtering, keyboard and mobile access',async({page},testInfo
   await page.getByText('Redemptions in the next 12 months',{exact:true}).click();await expect(page.getByRole('table',{name:'Upcoming gilt redemptions'})).toBeVisible();
   await page.getByText('Explore the gilt stock',{exact:true}).click();await page.getByLabel('Find a gilt').fill('GB00BNNGP668');await expect(page.getByRole('table',{name:'Gilts outstanding'}).locator('tbody tr')).toHaveCount(1);
   await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.getByRole('button',{name:'Fiscal',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
+  await page.getByRole('button',{name:'Explore',exact:true}).focus();await page.keyboard.press('Enter');await page.getByRole('link',{name:'Monthly and year-to-date finances →',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
   await page.getByRole('button',{name:'Debt & financing',exact:true}).click();
   const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
   await page.screenshot({path:testInfo.outputPath('debt-mobile.png'),fullPage:true});
@@ -70,7 +70,7 @@ test('Pricing compares matched curves and exports maturity-labelled changes',asy
  const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(axe.violations).toEqual([]);
  await page.screenshot({path:testInfo.outputPath('pricing-mobile.png'),fullPage:true});
  await page.getByRole('button',{name:'Debt & financing',exact:true}).click();await expect(page.getByRole('heading',{name:'Nominal gilt yield curve',exact:true})).toHaveCount(0);
- await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page).toHaveURL(new RegExp(`pricingDate=${latest.date}`));
+ await page.getByRole('button',{name:'Explore',exact:true}).click();await page.getByRole('link',{name:'Yield curves and changes →',exact:true}).click();await expect(page).toHaveURL(new RegExp(`pricingDate=${latest.date}`));
 });
 
 test('fiscal GDP toggle changes flows, persists and exports denominators',async({page,request},testInfo)=>{

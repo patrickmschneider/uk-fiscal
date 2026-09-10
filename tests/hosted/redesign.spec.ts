@@ -5,7 +5,7 @@ test('overview gives a concise orientation and direct analytical paths',async({p
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
  await expect(page.getByRole('heading',{name:'UK fiscal dashboard',exact:true})).toBeVisible();
- for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
+ for(const name of ['Overview','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
  await expect(page.locator('.overview .chart-panel')).toHaveCount(7);
  await expect(page.locator('.overview .metric')).toHaveCount(0);
  await expect(page.locator('.overview')).toContainText('Accounting contributions, not estimates of policy effects');
@@ -120,12 +120,12 @@ test('deficit decompositions reconcile and distinguish forecasts and structural 
  await expect(chart.getByText('Forecast',{exact:true})).toBeVisible();
  await expect(page.getByRole('combobox',{name:'Deficit display',exact:true})).toHaveCount(0);
  await expect(chart.locator('.recharts-bar')).toHaveCount(2);
- await page.getByRole('combobox',{name:'History',exact:true}).selectOption('all');
- await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText('cycle estimate');
- const historical=data.deficitHistory.find((x:{year:string})=>x.year==='1990-91');
- await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText((historical.borrowingBn-historical.deficitInterestBn).toFixed(2));
- await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText(historical.structuralBorrowingBn.toFixed(2));
- await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1975-76'})).toBeVisible();
+ await expect(page.getByRole('combobox',{name:'History',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'2000-01'})).toContainText('cycle estimate');
+ const historical=data.deficitHistory.find((x:{year:string})=>x.year==='2000-01');
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'2000-01'})).toContainText((historical.borrowingBn-historical.deficitInterestBn).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}));
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'2000-01'})).toContainText(historical.structuralBorrowingBn.toFixed(2));
+ await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1975-76'})).toHaveCount(0);
  const table=page.getByRole('table',{name:'Deficit reconciliation',exact:true}),row=table.getByRole('row').filter({hasText:r.year});
  await expect(row).toContainText((r.borrowingBn-r.interestBn).toFixed(2));await expect(row).toContainText((r.borrowingBn-r.structuralBorrowingBn).toFixed(2));await expect(row).toContainText('Forecast');
  await page.getByRole('combobox',{name:'Deficit units',exact:true}).selectOption('gdp');await expect(row).toContainText(((r.borrowingBn-r.structuralBorrowingBn)/r.gdpBn*100).toFixed(2));

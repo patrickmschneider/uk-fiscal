@@ -8,7 +8,7 @@ test('published app loads its data, navigation and charts beneath the project pa
  await page.goto('./?page=data&view=fiscal');await expect(page.getByRole('heading',{name:'The UK’s fiscal position.'})).toBeVisible();
  await page.getByRole('combobox',{name:'Flow units',exact:true}).selectOption('gdp');
  await page.getByRole('button',{name:'Debt & financing',exact:true}).click();await expect(page.getByRole('heading',{name:'The stock. The cost. The calendar.'})).toBeVisible();
- await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page.getByRole('heading',{name:'Yields and inflation pricing.'})).toBeVisible();
+ await page.getByRole('button',{name:'Explore',exact:true}).click();await page.getByRole('link',{name:'Yield curves and changes →',exact:true}).click();await expect(page.getByRole('heading',{name:'Yields and inflation pricing.'})).toBeVisible();
  const curve=await (await request.get('data/curve.json')).json();
  for(const id of ['yield-curve','real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
  const source=page.locator('[aria-labelledby="yield-curve-title"] .source-line');
