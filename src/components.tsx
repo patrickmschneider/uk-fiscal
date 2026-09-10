@@ -1,6 +1,7 @@
 import {useRef,useState,type ReactNode} from 'react';
 import {Download,Table2,ChevronDown,ArrowUpRight,ImageDown} from 'lucide-react';
 import {ResponsiveContainer,LineChart,Line,CartesianGrid,XAxis,YAxis,Tooltip,ReferenceLine,ReferenceArea,ComposedChart,Bar,Cell} from 'recharts';
+import {forecastLabelPosition} from './chartPlacement';
 import {downloadCsv,fmt,type Source} from './data';
 
 export const colours=['#17685a','#b47936','#829097','#7285a6'];
@@ -19,7 +20,7 @@ export function ChartPanel({id,title,subtitle,summary,rows,lines,overlayLine,yDo
   const [table,setTable]=useState(false);const ref=useRef<HTMLElement>(null);const [exportError,setExportError]=useState('');
   const meta=`${title}. ${subtitle||''}. ${unit}. ${summary}. ${note||''}. ${sources.map(s=>`${s.name||s.title||s.id}: ${s.url}; published ${s.publicationDate||'unknown'}. ${s.attribution||''}`).join('; ')}`;
   const forecastRows=rows.filter(r=>r.status==='Forecast');
-  const forecastShade=shadeForecast&&forecastRows.length>1?<ReferenceArea x1={forecastRows[0][xKey] as string} x2={forecastRows.at(-1)![xKey] as string} fill="#e4e8ed" fillOpacity={0.7} strokeOpacity={0} label={{value:'Forecast',position:'insideTop',fill:'#53616d',fontSize:11}} shape={(props: {x?:number;y?:number;width?:number;height?:number})=>{const {x=0,y=0,width=0,height=0}=props;const half=width/(forecastRows.length-1)/2;return <rect x={x-half} y={y} width={width+half+(bars?half:0)} height={height} fill="#e4e8ed" fillOpacity={0.7}/>;}}/>:null;
+  const forecastShade=shadeForecast&&forecastRows.length>1?<ReferenceArea x1={forecastRows[0][xKey] as string} x2={forecastRows.at(-1)![xKey] as string} fill="#e4e8ed" fillOpacity={0.7} strokeOpacity={0} label={{value:'Forecast',position:forecastLabelPosition(rows,lines.map(l=>l.key),bars&&showBars,overlayLine?.key,yDomain),fill:'#53616d',fontSize:11}} shape={(props: {x?:number;y?:number;width?:number;height?:number})=>{const {x=0,y=0,width=0,height=0}=props;const half=width/(forecastRows.length-1)/2;return <rect x={x-half} y={y} width={width+half+(bars?half:0)} height={height} fill="#e4e8ed" fillOpacity={0.7}/>;}}/>:null;
   const plotLines=overlayLine?[...lines,overlayLine]:lines;
   const headers=[xLabel||(xKey==='label'?'Period':xKey),...plotLines.map(l=>`${l.label} (${unit})`),...extraColumns.map(c=>c.label)];
   const csvRows=rows.map(r=>[r[xKey],...plotLines.map(l=>r[l.key]),...extraColumns.map(c=>r[c.key])]);
