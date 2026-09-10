@@ -29,3 +29,23 @@ export function forecastHistoryRows(history:OutlookRow[],vintage:Vintage,key:str
  const baseline=ordered.filter(r=>r.year<vintage.forecastStart&&typeof r[key]==='number').at(-1)?.year;
  return ordered.map(r=>({label:r.year,actual:r.year<vintage.forecastStart&&typeof r[key]==='number'?r[key] as number:null,forecast:(r.year>=vintage.forecastStart||r.year===baseline)&&typeof r[key]==='number'?r[key] as number:null}));
 }
+
+/** Annual OBR anchors on a monthly axis; no invented monthly forecast values. */
+export function overviewForecastRows(actual:Record<string,string|number|null>[],vintage:Vintage|null|undefined,units:string){
+ const rows=new Map<string,Record<string,string|number|null>>(actual.map(r=>[String(r.label),{...r,spendingForecast:null as number|null,receiptsForecast:null as number|null,debtForecast:null as number|null,status:'Outturn'}]));
+ if(!vintage||!actual.length)return [...rows.values()];
+ const yearEnd=(year:string)=>`${Number(year.slice(0,4))+1}-03`;
+ const end=yearEnd(vintage.rows.at(-1)!.year);
+ let month=String(actual.at(-1)!.label);
+ while(month<end){const [y,m]=month.split('-').map(Number);month=m===12?`${y+1}-01`:`${y}-${String(m+1).padStart(2,'0')}`;rows.set(month,{label:month,spending:null,receipts:null,debt:null,spendingForecast:null,receiptsForecast:null,debtForecast:null,status:'Forecast'});}
+ for(const r of vintage.rows){
+  const date=yearEnd(r.year);const row=rows.get(date);
+  if(!row)continue;
+  const flow=(key:string)=>typeof r[key]==='number'?(units==='bn'?r[key] as number:r.gdpBn?(r[key] as number)/r.gdpBn*100:null):null;
+  row.spendingForecast=flow('spendingBn');row.receiptsForecast=flow('receiptsBn');
+  row.debtForecast=typeof r[units==='bn'?'debtBn':'debtPct']==='number'?r[units==='bn'?'debtBn':'debtPct'] as number:null;
+ }
+ const baseline=vintage.rows.filter(r=>r.year<vintage.forecastStart).at(-1);
+ for(const [date,row] of rows)if(baseline&&date>yearEnd(baseline.year))row.status='Forecast';
+ return [...rows.values()].sort((a,b)=>String(a.label).localeCompare(String(b.label)));
+}

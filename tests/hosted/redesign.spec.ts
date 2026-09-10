@@ -6,7 +6,7 @@ test('overview gives a concise orientation and direct analytical paths',async({p
  await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
  await expect(page.getByRole('heading',{name:'The fiscal position.',exact:true})).toBeVisible();
  for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
- await expect(page.locator('.overview .chart-panel')).toHaveCount(8);
+ await expect(page.locator('.overview .chart-panel')).toHaveCount(7);
  await expect(page.locator('.overview .metric')).toHaveCount(0);
  await expect(page.locator('.overview')).toContainText('Accounting contributions, not estimates of policy effects');
  await expect(page.locator('#overview-position-title')).toBeVisible();
@@ -84,7 +84,7 @@ test('shared units change headline and official forecast stocks and follow compo
  await page.goto('./');await page.getByRole('button',{name:'£bn',exact:true}).click();
  await expect(page.locator('.lead-sentence')).toContainText('£');
  await expect(page.getByRole('link',{name:'Compare yield curves →',exact:true})).toHaveAttribute('href','?page=pricing&units=bn');
- const debt=page.locator('[aria-labelledby="overview-path-debt-title"]');await debt.getByRole('button',{name:'Show data table for Debt outlook',exact:true}).click();
+ const debt=page.locator('[aria-labelledby="overview-debt-title"]');await debt.getByRole('button',{name:'Show data table for Total public-sector net debt',exact:true}).click();
  await expect(debt.getByRole('table')).toContainText(end.debtBn.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}));
  await expect(debt.getByRole('table')).toContainText('OBR forecast (£bn)');
  await page.getByRole('link',{name:'Spending & tax composition →',exact:true}).click();
