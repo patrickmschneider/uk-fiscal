@@ -116,10 +116,7 @@ test('deficit decompositions reconcile and distinguish forecasts and structural 
  const chart=page.locator('[aria-labelledby="deficit-primary-title"]');
  await expect(chart.locator('.recharts-reference-area')).toBeVisible();
  await expect(chart.getByText('Forecast',{exact:true})).toBeVisible();
- await page.getByRole('combobox',{name:'Deficit display',exact:true}).selectOption('net');
- await expect(chart.locator('.recharts-bar')).toHaveCount(0);
- await expect(chart.locator('.recharts-line-curve')).toBeVisible();
- await page.getByRole('combobox',{name:'Deficit display',exact:true}).selectOption('components');
+ await expect(page.getByRole('combobox',{name:'Deficit display',exact:true})).toHaveCount(0);
  await expect(chart.locator('.recharts-bar')).toHaveCount(2);
  await page.getByRole('combobox',{name:'History',exact:true}).selectOption('all');
  await expect(page.getByRole('table',{name:'Deficit reconciliation',exact:true}).getByRole('row').filter({hasText:'1990-91'})).toContainText('structural unavailable');
