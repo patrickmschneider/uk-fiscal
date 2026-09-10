@@ -128,12 +128,14 @@ def parse_history(pusf,gdp):
 def fetch_outlook(fetch):
     vintages=parse_efo(fetch(EFO_URL))
     history,release=parse_history(fetch(ONS_URL),fetch(GDP_URL))
+    from .obr_history import WORKBOOK,parse_databank
+    deficit_history=parse_databank(WORKBOOK.read_bytes())
     rules=[{'name':'Stability rule','description':'Cover current spending with receipts.','definition':'Current budget surplus in 2029-30 until that is the third forecast year; thereafter balance or surplus from the third year of the rolling forecast.','targetYear':'2029-30','headroomBn':21.7,'met':True,'binding':True,'assessmentDate':'2025-11-26','sourceUrl':BUDGET_URL,'definitionUrl':CHARTER_URL},
       {'name':'Investment rule','description':'Net financial liabilities fall relative to GDP.','definition':'Public sector net financial liabilities fall as a share of GDP by 2029-30 until that is the third forecast year; thereafter by the third rolling forecast year.','targetYear':'2029-30','headroomBn':24.4,'met':True,'binding':False,'assessmentDate':'2025-11-26','sourceUrl':BUDGET_URL,'definitionUrl':CHARTER_URL},
       {'name':'Welfare cap','description':'Covered welfare expenditure stays within the Treasury cap and margin.','definition':'A supplementary cap on specified welfare expenditure; this is not a cap on all welfare or pension spending.','targetYear':None,'headroomBn':None,'met':None,'binding':False,'assessmentDate':None,'sourceUrl':CHARTER_URL,'notes':'Numerical cap assessment not imported.'}]
     vintages[0]['rules']=rules[:2]
     vintages[1]['rules']=[]
-    data={'schemaVersion':1,'asOf':'2026-03-03','latestVintage':'2026-03','vintages':vintages,'history':history,'historyAsOf':release,'rules':rules,
+    data={'schemaVersion':1,'asOf':'2026-03-03','latestVintage':'2026-03','vintages':vintages,'history':history,'historyAsOf':release,'deficitHistory':deficit_history['rows'],'deficitHistoryMetadata':{k:v for k,v in deficit_history.items() if k!='rows'},'rules':rules,
       'currentBudgetUpdate':{'year':'2029-30','surplusBn':-next(r['currentBudgetDeficitBn'] for r in vintages[-1]['rows'] if r['year']=='2029-30'),'publicationDate':'2026-03-03','formalAssessment':False,'sourceUrl':EFO_URL,'note':'The March 2026 EFO does not formally assess compliance with the fiscal rules. £23.6bn is the updated current-budget surplus forecast, not a new formal rule assessment.'},
       'headroomHistory':[{'vintage':'2025-03','label':'March 2025','publicationDate':'2025-03-26','headroomBn':9.9,'targetYear':'2029-30','sourceUrl':NOV_PAGE},{'vintage':'2025-11','label':'November 2025','publicationDate':'2025-11-26','headroomBn':21.7,'targetYear':'2029-30','sourceUrl':BUDGET_URL}],
       'sensitivities':[{'id':'rates','label':'Bank Rate and gilt yields +1pp','shock':1,'unit':'percentage points','borrowingChangeBn':15,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Sustained rise from 2026-27. Official borrowing sensitivity, not an elasticity of headroom.'},{'id':'nominal-growth','label':'Nominal GDP growth −0.1pp each year','shock':-0.1,'unit':'percentage points per year','borrowingChangeBn':8,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Official isolated ready-reckoner shock from 2026-27.'},{'id':'rpi','label':'RPI inflation +1pp','shock':1,'unit':'percentage points','borrowingChangeBn':11,'targetYear':'2030-31','vintage':'2026-03','sourceUrl':EFO_URL+'#page=103','note':'Sustained rise from 2026-27. Downward 1pp shock reduces borrowing £10bn; asymmetry is official.'}],
@@ -180,6 +182,11 @@ def validate_outlook(data):
             if abs((row['deficitInterestBn']-row['borrowingBn'])/row['gdpBn']*100-row['primaryBalancePct'])>.00001:
                 raise ValueError('Historical primary balance identity failed')
         if abs(row['spendingBn']-row['receiptsBn']-row['borrowingBn'])>.002:raise ValueError('History borrowing identity failed')
+    for row in data.get('deficitHistory',[]):
+        if row['gdpBn']<=0 or any(not math.isfinite(row[k]) for k in ('borrowingBn','structuralBorrowingBn','primaryBalanceBn','structuralPrimaryBalanceBn','deficitInterestBn')):
+            raise ValueError('Invalid OBR deficit history')
+        if abs(row['borrowingBn']+row['primaryBalanceBn']-row['deficitInterestBn'])>.00001:
+            raise ValueError('OBR deficit history primary identity failed')
     update=data['currentBudgetUpdate']
     latest=next(v for v in vintages if v['id']==data['latestVintage'])
     target=next(r for r in latest['rows'] if r['year']==update['year'])

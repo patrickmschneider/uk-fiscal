@@ -5,7 +5,7 @@ export function deficitParts(row:OutlookRow,units:string){
  const total=scale(row.borrowingBn),interest=scale(row.interestBn),structural=scale(row.structuralBorrowingBn);
  const primary=total!=null&&interest!=null?total-interest:null;
  const cyclical=total!=null&&structural!=null?total-structural:null;
- const structuralPrimary=row.structuralPrimaryBalancePct==null?null:units==='bn'?(row.gdpBn?-row.structuralPrimaryBalancePct/100*row.gdpBn:null):-row.structuralPrimaryBalancePct;
+ const structuralPrimary=typeof row.structuralPrimaryBalanceBn==='number'?scale(-row.structuralPrimaryBalanceBn):row.structuralPrimaryBalancePct==null?null:units==='bn'?(row.gdpBn?-row.structuralPrimaryBalancePct/100*row.gdpBn:null):-row.structuralPrimaryBalancePct;
  return {total,interest,primary,structural,cyclical,structuralPrimary,cyclicalPrimary:primary!=null&&structuralPrimary!=null?primary-structuralPrimary:null};
 }
 
@@ -13,5 +13,5 @@ export function deficitParts(row:OutlookRow,units:string){
 // financing proxy separate. Missing cyclical estimates remain missing.
 export function deficitHistoryRows(history:OutlookRow[],vintageRows:OutlookRow[],start:string){
  const first=vintageRows[0]?.year||'';
- return [...history.filter(r=>r.year<first).map(r=>({...r,interestBn:typeof r.deficitInterestBn==='number'?r.deficitInterestBn:null,structuralBorrowingBn:null,structuralPrimaryBalancePct:null})),...vintageRows].filter(r=>r.year>=start);
+ return [...history.filter(r=>r.year<first).map(r=>({...r,interestBn:typeof r.deficitInterestBn==='number'?r.deficitInterestBn:null,structuralBorrowingBn:r.structuralBorrowingBn??null,structuralPrimaryBalancePct:r.structuralPrimaryBalancePct??null})),...vintageRows].filter(r=>r.year>=start);
 }
