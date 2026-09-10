@@ -26,7 +26,7 @@
 .overview .briefing-lead{padding:0 0 8px}.overview .briefing-lead h1{margin-bottom:12px}.overview .lead-sentence{margin:12px 0 16px;font-size:20px;line-height:1.55}
 .overview-tools{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;margin:0 0 12px;font-size:13px}
 .overview .chart{height:250px}.overview .forecast-pair .chart{height:210px}.overview .chart-summary{margin:8px 0}.overview .source-line{padding-top:8px;margin-top:8px}
-.overview-changes{border-top:1px solid var(--border);padding:18px 0 12px}.overview-changes h2,.overview-market h2,.overview .section-heading h2{font-size:22px;margin:0 0 12px}
+.overview-changes{border-top:1px solid var(--border);padding:18px 0 12px}.overview-changes h2,.overview-market>.section-heading h2,.overview .section-heading h2{font-size:22px;margin:0 0 12px}
 .overview-changes h3{font-size:15px;margin:4px 0 8px}.overview-changes p{font-size:13px;margin:6px 0}.overview-changes a,.overview .section-heading a{font-size:13px}
 .overview .section-heading{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:14px 0 0}.overview-market{border-top:1px solid var(--border);padding-top:16px}.overview-market p{font-size:14px;margin:8px 0}
 .forecast-pair{gap:28px}.forecast-pair>*{min-width:0}.forecast-pair .panel-heading{flex-wrap:wrap}.forecast-pair .chart-actions{margin-left:0}
@@ -43,3 +43,12 @@ fieldset{border:1px solid var(--border);padding:12px 16px;margin:16px 0;font-siz
 
 .source-line>summary{display:flex;align-items:center;gap:10px;min-height:28px;cursor:pointer;list-style:none}.source-line>summary::-webkit-details-marker{display:none}.source-preview{display:block;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.source-chevron{flex:none;transition:transform .15s}.source-line[open]>summary .source-chevron{transform:rotate(180deg)}.source-details{padding:8px 0 2px}.source-details a{max-width:100%}
 @media(min-width:701px){.overview-position-pair .chart-summary{min-height:40px}.overview-position-pair .legend{min-height:56px;align-content:flex-start}}
+
+/* Section / subsection / chart hierarchy; the brand carries the serif type. */
+.overview>.briefing-lead .eyebrow{margin-bottom:10px}.overview>.briefing-lead .lead-sentence{margin-top:0}
+.overview>.overview-deficit-origins>.section-heading h2,.overview>.overview-market>.section-heading h2{font-size:24px;font-weight:650}
+.overview .panel-heading h2,.overview .panel-heading h3,.overview .panel-heading h4{font-family:inherit;font-size:17px;font-weight:650;letter-spacing:-.02em;line-height:1.4;margin:0 0 5px}
+.overview-deficit-origins>.overview-composition>.section-heading h3,.overview-deficit-origins>.overview-deficits>.section-heading h3{font-size:20px;font-weight:600}
+.composition-ranking h4{font-size:17px;font-weight:650;margin:12px 0;letter-spacing:-.02em}
+@media(min-width:701px){.overview-market .composition-grid{grid-template-rows:repeat(5,auto);row-gap:0}.overview-market .composition-grid>.chart-panel{display:grid;grid-template-rows:subgrid;grid-row:span 5;row-gap:0}.overview-market .panel-heading{grid-row:1}.overview-market .chart-summary{grid-row:2}.overview-market .legend{grid-row:3}.overview-market .chart{grid-row:4}.overview-market .source-line{grid-row:5}}
+@media(min-width:701px){.overview-market .composition-grid>.chart-panel{grid-template-columns:minmax(0,1fr)}.overview-market .chart-panel>*{min-width:0;max-width:100%}}

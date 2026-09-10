@@ -24,7 +24,7 @@ test('published app loads its data, navigation and charts beneath the project pa
  expect(curve.breakevenCurves.length).toBeGreaterThan(0);expect(fiscal.observations.at(-1).date).toBe(fiscal.asOf);
  await page.setViewportSize({width:375,height:900});await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  const accessibility=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(accessibility.violations).toEqual([]);
- await page.locator('.brand').click();await expect(page.getByRole('heading',{name:'The fiscal position.'})).toBeVisible();
+ await page.locator('.brand').click();await expect(page.getByRole('heading',{name:'UK fiscal dashboard'})).toBeVisible();
  expect(errors).toEqual([]);
 });
 

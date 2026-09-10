@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 test('overview gives a concise orientation and direct analytical paths',async({page},info)=>{
  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('./');await expect(page).toHaveTitle('Fiscal Space');
- await expect(page.getByRole('heading',{name:'The fiscal position.',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'UK fiscal dashboard',exact:true})).toBeVisible();
  for(const name of ['Overview','Fiscal','Pricing','Debt & financing','Explore'])await expect(page.getByRole('navigation').getByRole('button',{name,exact:true})).toBeVisible();
  await expect(page.locator('.overview .chart-panel')).toHaveCount(7);
  await expect(page.locator('.overview .metric')).toHaveCount(0);
@@ -15,6 +15,8 @@ test('overview gives a concise orientation and direct analytical paths',async({p
  await expect(page.getByRole('link',{name:'Spending & tax composition →',exact:true})).toHaveAttribute('href',/page=fiscal&section=composition/);
  await expect(page.getByRole('link',{name:'Compare yield curves →',exact:true})).toHaveAttribute('href','?page=pricing&units=gdp');
  await expect(page.getByRole('link',{name:'Outlook, assumptions & vintages →',exact:true})).toHaveAttribute('href',/section=outlook/);
+ const plots=await page.locator('.overview-market .chart').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().top));expect(Math.abs(plots[0]-plots[1])).toBeLessThan(1);
+ await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.screenshot({path:info.outputPath('overview-desktop.png')});
  await page.getByRole('link',{name:'Compare yield curves →',exact:true}).click();await expect(page.locator('#yield-curve-title')).toBeVisible();
  expect(errors).toEqual([]);
