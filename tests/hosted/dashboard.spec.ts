@@ -11,7 +11,10 @@ test('published app loads its data, navigation and charts beneath the project pa
  await page.getByRole('button',{name:'Pricing',exact:true}).click();await expect(page.getByRole('heading',{name:'Yields and inflation pricing.'})).toBeVisible();
  const curve=await (await request.get('data/curve.json')).json();
  for(const id of ['yield-curve','real-curve','breakeven'])await expect(page.locator(`[aria-labelledby="${id}-title"] .recharts-line-curve`).first()).toBeVisible();
- await expect(page.getByRole('link',{name:'Bank of England · Gilt yield curves',exact:true}).first()).toBeVisible();
+ const source=page.locator('[aria-labelledby="yield-curve-title"] .source-line');
+ await expect(source).not.toHaveAttribute('open');
+ await source.locator('summary').click();
+ await expect(source.getByRole('link',{name:'Bank of England · Gilt yield curves',exact:true})).toBeVisible();
  for(const format of ['CSV','SVG']){
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:`Download Nominal gilt yield curve ${format}`,exact:true}).click();
   const download=await pending;const path=testInfo.outputPath(`curve.${format.toLowerCase()}`);await download.saveAs(path);
