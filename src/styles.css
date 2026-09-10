@@ -52,3 +52,7 @@ fieldset{border:1px solid var(--border);padding:12px 16px;margin:16px 0;font-siz
 .composition-ranking h4{font-size:17px;font-weight:650;margin:12px 0;letter-spacing:-.02em}
 @media(min-width:701px){.overview-market .composition-grid{grid-template-rows:repeat(5,auto);row-gap:0}.overview-market .composition-grid>.chart-panel{display:grid;grid-template-rows:subgrid;grid-row:span 5;row-gap:0}.overview-market .panel-heading{grid-row:1}.overview-market .chart-summary{grid-row:2}.overview-market .legend{grid-row:3}.overview-market .chart{grid-row:4}.overview-market .source-line{grid-row:5}}
 @media(min-width:701px){.overview-market .composition-grid>.chart-panel{grid-template-columns:minmax(0,1fr)}.overview-market .chart-panel>*{min-width:0;max-width:100%}}
+
+html{scroll-padding-top:116px}.site-header{position:sticky;top:0;z-index:30}.site-header.compact{box-shadow:0 2px 8px #193e350d}.site-header.compact .header-inner{height:64px;min-height:0}.site-header.compact .brand{font-size:23px}.site-header.compact .brand small{display:none}
+@media(max-width:1000px){.site-header.compact .header-inner{height:auto;min-height:0;padding:6px 18px 0;gap:4px 12px}.site-header.compact .brand{font-size:22px;line-height:30px}.site-header.compact .share-button{min-height:30px;padding:4px}.site-header.compact .header-inner nav{height:40px;gap:12px}.site-header.compact .header-inner nav button{min-height:40px}}
+@media(max-width:700px){.site-header.compact .header-inner nav{gap:0}}
