@@ -70,9 +70,9 @@ export function isOverdue(group:string,asOf:string,now=new Date()):boolean {
   let weekdays=0;for(let d=new Date(end);d<now;d.setUTCDate(d.getUTCDate()+1)){if(d.getUTCDay()!==0&&d.getUTCDay()!==6)weekdays++;if(weekdays>5)return true;}return false;
 }
 
-export function gdpAt(gdp:Gdp|undefined,end:string){
+export function gdpAt(gdp:Gdp|undefined,end:string,maxLagMonths=2){
  const row=gdp?.observations.filter(r=>r.date<=end).sort((a,b)=>a.date.localeCompare(b.date)).at(-1);
- if(!row||row.date<shiftMonth(end,-2)||typeof row.rollingAnnualMillion!=='number'||!Number.isFinite(row.rollingAnnualMillion)||row.rollingAnnualMillion<=0)return null;
+ if(!row||row.date<shiftMonth(end,-maxLagMonths)||typeof row.rollingAnnualMillion!=='number'||!Number.isFinite(row.rollingAnnualMillion)||row.rollingAnnualMillion<=0)return null;
  return row;
 }
 export function flowValue(value:number|null,end:string,units:string,gdp?:Gdp):number|null {

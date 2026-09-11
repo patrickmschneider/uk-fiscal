@@ -13,6 +13,7 @@ describe('fiscal accounting boundaries',()=>{
 describe('GDP scaling',()=>{
  const gdp={basis:'test',sources:[],observations:[{date:'2025-12',rollingAnnualMillion:2000},{date:'2026-03',rollingAnnualMillion:2400},{date:'2026-06',rollingAnnualMillion:3000}]};
  it('uses the latest completed quarter, never a future denominator',()=>{expect(gdpAt(gdp,'2026-05')?.date).toBe('2026-03');expect(gdpAt(gdp,'2026-07')?.date).toBe('2026-06');expect(gdpAt(gdp,'2026-09')).toBeNull();});
+ it('allows the publication lag for a current stock, while rejecting stale or future GDP',()=>{expect(gdpAt(gdp,'2026-09',5)?.date).toBe('2026-06');expect(gdpAt(gdp,'2026-12',5)).toBeNull();expect(gdpAt(gdp,'2026-05',5)?.date).toBe('2026-03');});
  it('preserves fiscal identities and does not annualise monthly/YTD flows',()=>{expect(flowValue(30,'2026-07','gdp',gdp)).toBe(1);expect(flowValue(-30,'2026-07','gdp',gdp)).toBe(-1);expect(flowValue(90,'2026-07','gdp',gdp)!-flowValue(60,'2026-07','gdp',gdp)!).toBe(flowValue(30,'2026-07','gdp',gdp));expect(flowValue(30,'2026-07','bn',gdp)).toBe(.03);});
  it('returns missing for unknown flows or invalid GDP',()=>{expect(flowValue(null,'2026-07','gdp',gdp)).toBeNull();expect(flowValue(30,'2026-07','gdp')).toBeNull();expect(flowValue(30,'2026-07','gdp',{...gdp,observations:[{date:'2026-06',rollingAnnualMillion:0}]})).toBeNull();});
 });
