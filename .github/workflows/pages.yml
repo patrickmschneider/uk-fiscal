@@ -80,12 +80,12 @@ jobs:
       - name: Test production app at its GitHub project path
         shell: bash
         run: |
-          mkdir -p .preview/uk-fiscal
-          cp -R dist/. .preview/uk-fiscal/
+          mkdir -p .preview/fiscal-space
+          cp -R dist/. .preview/fiscal-space/
           python -m http.server 4173 --bind 127.0.0.1 --directory .preview &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
-          APP_URL=http://127.0.0.1:4173/uk-fiscal/ npm run test:hosted
+          APP_URL=http://127.0.0.1:4173/fiscal-space/ npm run test:hosted
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

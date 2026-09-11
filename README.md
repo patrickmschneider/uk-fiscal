@@ -4,7 +4,7 @@ A personal UK fiscal research tool for Patrick Schneider. Start with a concise O
 
 ## Hosted app
 
-[Open the dashboard](https://patrickmschneider.github.io/uk-fiscal/). GitHub Pages serves the app over HTTPS; no login, backend or paid subscription is required. The app and data are public.
+[Open the dashboard](https://patrickmschneider.github.io/fiscal-space/). GitHub Pages serves the app over HTTPS; no login, backend or paid subscription is required. The app and data are public.
 
 The **Publish dashboard** GitHub Actions workflow deploys pushes to `main` and checks official sources daily at 13:17 UTC (13:17 London winter / 14:17 summer; GitHub schedules may run late). For an immediate refresh, open the repository’s Actions tab, select that workflow, and choose **Run workflow** with refresh enabled. A source failure retains validated previous data, displays its failure status, and marks the run failed after deploying. Enable repository Actions notifications in your GitHub notification settings if you want failure emails. GitHub can disable schedules on inactive public repositories after 60 days; re-enable the workflow if that happens.
 
@@ -87,8 +87,8 @@ Every build preserves a checksummed bundle on `data-history` before deployment. 
 To rehearse recovery without touching the working app, clone the archive branch and restore into a temporary folder:
 
 ```sh
-git clone --branch data-history --single-branch https://github.com/patrickmschneider/uk-fiscal.git /tmp/uk-fiscal-history
-python -m pipeline.archive_history --destination /tmp/uk-fiscal-history --restore SNAPSHOT_ID --root /tmp/uk-fiscal-restore
+git clone --branch data-history --single-branch https://github.com/patrickmschneider/fiscal-space.git /tmp/fiscal-space-history
+python -m pipeline.archive_history --destination /tmp/fiscal-space-history --restore SNAPSHOT_ID --root /tmp/fiscal-space-restore
 ```
 
 The command verifies the complete dataset bundle and reports `requiredCodeSha`. For a production rollback, recover that application commit in an isolated checkout, restore the matching snapshot (use `--code-sha` to enforce the match), and run the build and tests. Commit the recovered code/data to `main` while preserving the publishing workflow; the normal push deploys that pair without refreshing it first. Avoid force-pushing.

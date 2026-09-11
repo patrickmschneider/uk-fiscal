@@ -39,7 +39,7 @@ class Fetcher:
         error=None
         for attempt in range(2):
             try:
-                response=requests.get(url,timeout=(10,45),headers={'User-Agent':'UKFiscalDashboard/0.1 (public research; https://github.com/patrickmschneider/uk-fiscal)'})
+                response=requests.get(url,timeout=(10,45),headers={'User-Agent':'UKFiscalDashboard/0.1 (public research; https://github.com/patrickmschneider/fiscal-space)'})
                 response.raise_for_status();raw=response.content
                 entry={'url':url,'resolvedUrl':response.url,'retrievedAt':stamp(),'sha256':digest(raw),'bytes':len(raw),'contentType':response.headers.get('Content-Type','')}
                 atomic(self.archive/'objects'/entry['sha256'],raw)

@@ -1,7 +1,7 @@
 # UK Fiscal Dashboard: implementation and handoff plan
 
 Status: implementation reference; owner-approved refinements now add a separate Pricing tab and GDP-scaled fiscal flows (details in STATUS.md); the local dashboard and data pipeline are built. See STATUS.md for validation and remaining acceptance gaps.
-Owner: Patrick Schneider. Repository: https://github.com/patrickmschneider/uk-fiscal
+Owner: Patrick Schneider. Repository: https://github.com/patrickmschneider/fiscal-space
 Plan date: 6 September 2026.
 
 Independent sceptical and design-planning reviews completed on 6 September 2026. All recommendations are incorporated here, including explicit required panels, failure signalling during partial updates, code/data compatibility and separate local/hosted test gates. No unresolved plan blocker remains; this does not constitute validation of actual source data or application code.
@@ -239,7 +239,7 @@ Write tests for statistical transformations and failure modes rather than mirror
 - Auction duplicates, revised/cancelled dates, missing announced size, tail inapplicability and post-auction fields.
 - Pipeline integration: corrupt download rejected, last good dataset retained, independent source groups dated correctly, rerun idempotent, archive exists before promotion.
 - Local browser smoke (M3): both pages, deep links and reloads, keyboard controls, narrow layout, stale state, data tables and CSV. Test chart export if implemented.
-- Hosted browser smoke (M4): repeat core interactions on actual GitHub Pages, including direct links/reloads under `/uk-fiscal/` and mandatory chart export. A development-server pass does not prove Pages routing works.
+- Hosted browser smoke (M4): repeat core interactions on actual GitHub Pages, including direct links/reloads under `/fiscal-space/` and mandatory chart export. A development-server pass does not prove Pages routing works.
 - One automated accessibility scan plus manual keyboard/zoom/contrast and chart-label review. Test Chromium and a second engine, preferably WebKit for likely iPhone/iPad use.
 
 Use fixtures for routine CI; keep scheduled live-source health checks separate so source outages do not turn every code PR red. Run lint, typecheck, relevant tests and production build once per meaningful change. Broaden testing when failures or new risks justify it. A sensible performance budget is a usable primary view within about three seconds on a throttled mobile test, a compact initial data payload (target below 1 MB compressed), and lazy loading of detailed/history datasets; measure and document tradeoffs rather than building a performance programme.
