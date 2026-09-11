@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {ArrowUpRight,ArrowRight,Download,Landmark,CalendarDays,Info,ExternalLink,Link as LinkIcon,Check} from 'lucide-react';
-import {loadBundle,gdpAt,flowValue,total,cumulative,fiscalStart,fyLabel,shiftMonth,calendarAnniversary,operationEnd,fmt,bn,dateLabel,downloadCsv,isOverdue,type Bundle,type Mode,type Observation} from './data';
+import {annualComparisonDate,loadBundle,gdpAt,flowValue,total,cumulative,fiscalStart,fyLabel,shiftMonth,calendarAnniversary,operationEnd,fmt,bn,dateLabel,downloadCsv,isOverdue,type Bundle,type Mode,type Observation} from './data';
 import {ExploreHome} from './ExploreHome';
 import {Briefing,OutlookPage,RulesPage,Monitor,TrackRecord} from './Narrative';
 import {SeriesExplorer,Methodology,DerivedSeries} from './Explorer';
@@ -94,8 +94,9 @@ function PricingPage({bundle,onReload,reloading}:{bundle:Bundle;onReload:()=>voi
  const dates=curve.curves.map(c=>c.date).sort().reverse();
  const [dateParam,setDate]=useParam('pricingDate',dates[0]||'');
  const selected=dates.includes(dateParam)?dateParam:dates[0];
- const [compareParam,setCompare]=useParam('pricingCompare',dates[1]||dates[0]||'');
- const comparison=dates.includes(compareParam)?compareParam:dates[1]||selected;
+ const defaultCompare=annualComparisonDate(dates,selected||'');
+ const [compareParam,setCompare]=useParam('pricingCompare',defaultCompare);
+ const comparison=dates.includes(compareParam)?compareParam:defaultCompare;
  const dateControls=(prefix='')=><div className="pricing-controls"><DatePicker label={prefix?`${prefix}: observation date`:'Observation date'} value={selected} onChange={setDate} dates={dates}/><DatePicker label={prefix?`${prefix}: compare with`:'Compare with'} value={comparison} onChange={setCompare} dates={dates}/></div>;
  const incomplete=!curve.realCurves?.length||!curve.breakevenCurves?.length;
  const datasets=[{id:'yield-curve',title:'Nominal gilt yield curve',data:curve.curves,description:'Fitted nominal zero-coupon spot yields. Market yields are not coupons payable on the existing debt stock.'},{id:'real-curve',title:'Real gilt yield curve',data:curve.realCurves||[],description:'Fitted real zero-coupon spot yields from RPI-linked gilts.'},{id:'breakeven',title:'RPI breakeven inflation',data:curve.breakevenCurves||[],description:'Matched nominal minus real spot yields: annualised RPI inflation compensation over each horizon. Includes inflation risk and relative liquidity premia; not a pure inflation forecast.'}];

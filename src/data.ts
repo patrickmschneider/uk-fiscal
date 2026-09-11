@@ -43,7 +43,7 @@ export type Mode='ytd'|'month'|'rolling';
 export function fiscalStart(period:string):number {const [year,month]=period.split('-').map(Number);return year-(month<4?1:0);}
 export function fyLabel(year:number):string {return `${year}–${String(year+1).slice(-2)}`;}
 export function shiftMonth(period:string,delta:number):string {const [y,m]=period.split('-').map(Number);const d=new Date(Date.UTC(y,m-1+delta,1));return d.toISOString().slice(0,7);}
-export function calendarAnniversary(date:string):string {const [y,m,d]=date.split('-').map(Number);const lastDay=new Date(Date.UTC(y+1,m,0)).getUTCDate();return `${y+1}-${String(m).padStart(2,'0')}-${String(Math.min(d,lastDay)).padStart(2,'0')}`;}
+export function calendarAnniversary(date:string,years=1):string {const [y,m,d]=date.split('-').map(Number);const lastDay=new Date(Date.UTC(y+years,m,0)).getUTCDate();return `${y+years}-${String(m).padStart(2,'0')}-${String(Math.min(d,lastDay)).padStart(2,'0')}`;}
 export function operationEnd(event:Operation):string {if(event.datePrecision?.startsWith('week')){const d=new Date(`${event.date}T12:00:00Z`);d.setUTCDate(d.getUTCDate()+6);return d.toISOString().slice(0,10);}return event.date;}
 export function periodsFor(end:string,mode:Mode):string[] {const count=mode==='month'?1:mode==='rolling'?12:((Number(end.slice(5))+8)%12)+1;return Array.from({length:count},(_,i)=>shiftMonth(end,i-count+1));}
 export function total(rows:Observation[],key:string,end:string,mode:Mode):number|null {
@@ -79,4 +79,11 @@ export function flowValue(value:number|null,end:string,units:string,gdp?:Gdp):nu
  if(value==null)return null;
  if(units!=='gdp')return value/1000;
  const denominator=gdpAt(gdp,end);return denominator?value/denominator.rollingAnnualMillion!*100:null;
+}
+
+/** Last available observation on or before the previous calendar anniversary. */
+export function annualComparisonDate(dates:string[],observation:string):string {
+ const sorted=[...dates].sort();
+ const anniversary=calendarAnniversary(observation,-1);
+ return sorted.filter(date=>date<=anniversary).at(-1)||sorted[0]||'';
 }

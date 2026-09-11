@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {gdpAt,flowValue,fiscalStart,periodsFor,total,cumulative,csvText,calendarAnniversary,operationEnd,isOverdue,type Observation} from './data';
+import {annualComparisonDate,gdpAt,flowValue,fiscalStart,periodsFor,total,cumulative,csvText,calendarAnniversary,operationEnd,isOverdue,type Observation} from './data';
 describe('fiscal accounting boundaries',()=>{
  it('uses April financial years',()=>{expect(fiscalStart('2026-03')).toBe(2025);expect(fiscalStart('2026-04')).toBe(2026);expect(periodsFor('2026-03','ytd')).toHaveLength(12);expect(periodsFor('2026-04','ytd')).toEqual(['2026-04']);});
  it('requires every month, including explicit nulls',()=>{const rows:Observation[]=[{date:'2026-04',borrowing:4},{date:'2026-06',borrowing:3}];expect(total(rows,'borrowing','2026-06','ytd')).toBeNull();expect(total(rows,'borrowing','2026-04','rolling')).toBeNull();expect(total([{date:'2026-04',borrowing:null}],'borrowing','2026-04','month')).toBeNull();});
@@ -15,4 +15,10 @@ describe('GDP scaling',()=>{
  it('uses the latest completed quarter, never a future denominator',()=>{expect(gdpAt(gdp,'2026-05')?.date).toBe('2026-03');expect(gdpAt(gdp,'2026-07')?.date).toBe('2026-06');expect(gdpAt(gdp,'2026-09')).toBeNull();});
  it('preserves fiscal identities and does not annualise monthly/YTD flows',()=>{expect(flowValue(30,'2026-07','gdp',gdp)).toBe(1);expect(flowValue(-30,'2026-07','gdp',gdp)).toBe(-1);expect(flowValue(90,'2026-07','gdp',gdp)!-flowValue(60,'2026-07','gdp',gdp)!).toBe(flowValue(30,'2026-07','gdp',gdp));expect(flowValue(30,'2026-07','bn',gdp)).toBe(.03);});
  it('returns missing for unknown flows or invalid GDP',()=>{expect(flowValue(null,'2026-07','gdp',gdp)).toBeNull();expect(flowValue(30,'2026-07','gdp')).toBeNull();expect(flowValue(30,'2026-07','gdp',{...gdp,observations:[{date:'2026-06',rollingAnnualMillion:0}]})).toBeNull();});
+});
+
+describe('annual pricing comparison',()=>{
+ it('uses the previous available trading day around the anniversary',()=>{expect(annualComparisonDate(['2026-09-07','2025-09-08','2025-09-05'],'2026-09-07')).toBe('2025-09-05');});
+ it('clamps leap day to February and preserves exact anniversaries',()=>{expect(annualComparisonDate(['2023-02-28','2023-03-01'],'2024-02-29')).toBe('2023-02-28');expect(annualComparisonDate(['2025-09-04','2025-09-05'],'2026-09-05')).toBe('2025-09-05');});
+ it('falls back to earliest available history',()=>{expect(annualComparisonDate(['2026-09-04','2026-09-03'],'2026-09-04')).toBe('2026-09-03');expect(annualComparisonDate([],'')).toBe('');});
 });
